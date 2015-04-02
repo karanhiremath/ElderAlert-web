@@ -52,7 +52,9 @@ router.post('/login', function(req,res,next){
                 res.render('user',{user: user.attributes});
             }else if (req.is('json')) {
                 return res.status(200).json({
-                    payload:user
+                    payload:parse.User.current(),
+                    session:parse.User.current()._sessionToken
+
                 })
             }
         },

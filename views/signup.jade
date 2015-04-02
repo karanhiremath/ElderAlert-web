@@ -12,6 +12,11 @@ block content
         input(type="password", name="password").required
         h3.label Phone Number*
         input(type="text", name="phone").required
+        h3.label Are you a Caretaker or an Elder?*
+        input(type="radio"m name="role", value="1",checked=role="caretaker")
+        | Caretaker
+        input(type="radio"m name="role", value="1",checked=role="elder")
+        | Elder
         br
         button(type="submit")#btn-login.btn.btn-primary.btn-large
             |Register
