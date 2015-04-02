@@ -1,0 +1,30 @@
+extends layout
+
+block content
+    h1 Hello! 
+    h2 Welcome to ElderAlert. Register Now!
+    form(method="post")        
+        h3.label Username* 
+        input(type="text", name="username").required
+        h3.label Email* 
+        input(type="text", name="email").required
+        h3.label Password* 
+        input(type="password", name="password").required
+        h3.label Phone Number*
+        input(type="text", name="phone").required
+        br
+        button(type="submit")#btn-login.btn.btn-primary.btn-large
+            |Register
+        div.clear-fix
+        div.btm-links
+            a(href='/login')#create-account Already Registered?
+
+block scripts
+    script(src='/vendor/jquery.min.js')
+    script(src='/vendor/jquery.form.js')
+    script(src='/vendor/bootstrap-modal.js')
+    script(src='/vendor/bootstrap-transition.js')
+    script(src='/js/views/login.js')
+    script(src='/js/controllers/loginController.js')
+    script(src='/js/form-validators/loginValidator.js')
+    script(src='/js/form-validators/emailValidator.js')
