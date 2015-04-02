@@ -48,8 +48,13 @@ router.post('/login', function(req,res,next){
 
     parse.User.logIn(username, password, {
         success: function(user) {
-            console.log(user)
-            res.render('user',{user: user.attributes});
+            if (req.is('html')) {
+                res.render('user',{user: user.attributes});
+            }else if (req.is('json')) {
+                return res.status(200).json({
+                    payload:user
+                })
+            }
         },
         error: function(user,error){
             res.render('login',{"error":error})
