@@ -1,14 +1,11 @@
 var express = require('express');
 var router = express.Router();
 var parse = require('parse').Parse;
+var caretaker = require('./caretaker');
+var elder = require('./elder');
 
-var elder = new parse.Role("elder")
-// elder.save()
+var app = express()
 
-var caretaker = new parse.Role("caretaker")
-// caretaker.save()
-
-/* GET users listing. */
 router.post('/signup', function(req, res, next) {
 
   var email = req.body.email;
@@ -21,15 +18,20 @@ router.post('/signup', function(req, res, next) {
     res.render('error',{error:"Please complete all required items"})
   }
 
+
   var user = new parse.User();
   user.set("email",email);
   user.set("password",password);
   user.set("username",username);
   user.set("phone",phone);
+  user.set("role", role);
 
   user.signUp(null,{
     success: function(user){
-        res.redirect(user.attributes.username);
+        if (user.attributes.role == 'caretaker') {
+            res.redirect(user.attributes.username+"/caretaker/setup");    
+        }
+        
     },
     error: function(user,error){
         return res.render('error',{error:error})
@@ -84,5 +86,8 @@ router.get('/:username', function(req,res,next){
         }
     })
 })
+
+app.use('/:username/caretaker', caretaker)
+app.use('/:username/elder', elder)
 
 module.exports = router;
