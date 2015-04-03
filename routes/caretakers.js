@@ -27,7 +27,7 @@ router.post('/:username/setup', function(req, res, next){
     
 })
 
-router.get('/:username/setup', function(req,res,next){
+router.get('/:username/setupCaretaker', function(req,res,next){
     console.log(req.params.username)
     var username = req.params.username
     var query = new parse.Query(parse.User);
@@ -37,7 +37,7 @@ router.get('/:username/setup', function(req,res,next){
             console.log(user)
             user = user[0].attributes
 
-            res.render('setup',{user:user, error:""});
+            res.render('setupCaretaker',{user:user, error:""});
         }
     })
 })
