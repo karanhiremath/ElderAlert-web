@@ -1,8 +1,49 @@
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
   color: #00B7FF;
+}
+
+a:visited{
+	text-decoration: none;
+}
+
+h1{
+	font-family: "Open Sans", sans-serif;}
+
+h2{
+  font: 24px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+#inputcontainer{
+	position: relative;
+	width:375px;
+}
+
+label.checkbox{
+	margin-left:25px;
+}
+
+#caretakerorelder{
+	margin-top:5px;
+	margin-bottom:5px;
+}
+
+#caretakerorelderprompt{
+	margin-bottom:5px;
+	margin-top:9px;
+}
+
+h3.label{
+	margin: 3px;
+	margin-top: 3px;
+
+	font-size:14px;
+	color:BLACK;
+}
+
+.radio-inline{
+	margin-left:10px;
 }

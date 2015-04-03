@@ -1,21 +1,19 @@
 extends layout
 
 block content
-    h1 Hello! 
-    h2 Please Login To Your Account
-    h3= error
-    form(method="post")        
-        h3.label Username 
-        input(type="text", name="username").required
-        h3.label Password 
-        input(type="password", name="password").required
-        br
-        br
-        button(type="submit")#btn-login.btn.btn-primary.btn-large
-            |Sign in  
-        label#remember-me.checkbox   Remember Me
-            input(type="checkbox", checked='checked')
-        h3
-            a(href='#')#forgot-password Forgot Your Password?
+  body
+    .container#inputcontainer
+      form.form-signin(role='form', method="post")
+        h2.form-signin-heading Please log in to your account
+        input.form-control(type='text', name="username", placeholder='Username', required='', autofocus='')
+        input.form-control(type='password', name='password', placeholder='Password', required='')
+        label.checkbox
+          input(type='checkbox', value='remember-me')
+          |  Remember Me
+        button.btn.btn-lg.btn-primary.btn-block(type='submit') Log in
+        h3 
+        a(href='#')#forgot-password Forgot Your Password?
             |  |  
             a(href='/users/signup')#create-account Create An Account
+
+
