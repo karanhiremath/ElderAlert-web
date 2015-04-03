@@ -82,8 +82,6 @@ router.get('/:username',function(req,res,next){
                             elder = elder[0].attributes
                             res.render('elder',{elder:elder})
                         }
-                    }else{
-                        res.redirect('/users/login');
                     }
                 }
             })
