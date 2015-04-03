@@ -1,5 +1,7 @@
+var parse = require('parse').Parse;
+
 // A complex subclass of Parse.Object
-var Geofence = Parse.Object.extend("Geofence", {
+var Geofence = parse.Object.extend("Geofence", {
   // Instance methods
   initialize: function (attrs, options) {
     this.location = new GeoPoint(0, 0);
