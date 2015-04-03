@@ -154,6 +154,8 @@ router.get('/:username', function(req,res,next){
 router.post('/',function(req,res,next){
     var caretakers = req.body.caretakers;
 
+    console.log(caretakers);
+
     var query = new parse.Query(Caretaker);
     query.containedIn("user.username",caretakers);
     query.find({
