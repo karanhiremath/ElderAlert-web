@@ -157,6 +157,8 @@ router.post('/',function(req,res,next){
 
     console.log(caretakers);
 
+    console.log(caretakers[0])
+
     var query = new parse.Query(Caretaker);
     query.containedIn("user.username",caretakers);
     query.find({
