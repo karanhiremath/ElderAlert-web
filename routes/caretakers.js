@@ -9,9 +9,10 @@ router.post('/:username', function(req, res, next){
     
     var username = req.params.username;
 
-    if(!parse.User.current()) {
-        res.redirect('/users/login');
-    }
+    console.log("here")
+    // if(!parse.User.current()) {
+    //     res.redirect('/users/login');
+    // }
 
     var caretaker = parse.User.current().attributes;
 
@@ -56,7 +57,7 @@ router.post('/:username', function(req, res, next){
                                             elder.save();
                                             caretaker.save();
                                         },
-                                        elder: function(elder, error){
+                                        error: function(elder, error){
 
                                         }
                                     })
@@ -82,10 +83,9 @@ router.post('/:username', function(req, res, next){
 })
 
 router.get('/:username', function(req,res,next){
-    console.log("got to redirect");
+    
     var username = req.params.username;
     
-
     if (!parse.User.current()) {
         res.redirect('/users/login');
     }
@@ -120,11 +120,14 @@ router.get('/:username', function(req,res,next){
                                     })
                                }
                         }else{
-                            console.log("rendering caretaker + user");
-                            console.log(caretaker);
+                            
+                            elders = caretaker.elders
+                            console.log(elders.length)
                             res.render('caretaker',
                             {
+                                user:caretaker.user,
                                 caretaker:caretaker,
+                                elders:elders,
                                 topError:"",
                                 addError:""
                             });
@@ -140,10 +143,12 @@ router.get('/:username', function(req,res,next){
                             success: function(caretaker) {
                                 caretaker = caretaker.attributes
                                 console.log(caretaker)
+                                elders = caretaker.elders
                                 res.render('caretaker',
                                 {
                                     user:user,
                                     caretaker:caretaker,
+                                    elders:elders,
                                     topError:"",
                                     addError:""
                                 });
