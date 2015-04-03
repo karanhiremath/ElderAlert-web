@@ -59,7 +59,9 @@ router.get('/:username/setup', function(req,res,next){
 })
 
 router.get('/:username',function(req,res,next){
-    console.log(req.params.username)
+    if(!parse.User.current()){
+        res.redirect('/users/login');
+    }
     var username = req.params.username
     var query = new parse.Query(parse.User);
     query.equalTo("username",username);
@@ -73,7 +75,6 @@ router.get('/:username',function(req,res,next){
                 success: function(elder) {
                     
                     if(req.get('content-type') == 'application/json'){
-                        console.log("here")
                         return res.status(200).json({
                             payload:elder,
                             session:parse.User.current()._sessionToken
