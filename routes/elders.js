@@ -67,21 +67,23 @@ router.get('/:username',function(req,res,next){
     query.equalTo("username",username);
     query.find({
         success: function(user) {
-            console.log(user)
             user = user[0].attributes
             var query = new parse.Query(Elder);
             query.equalTo("user",user);
             query.find({
                 success: function(elder) {
-                    
-                    if(req.get('content-type') == 'application/json'){
-                        return res.status(200).json({
-                            payload:elder,
-                            session:parse.User.current()._sessionToken
-                        })
-                    } else {
-                        elder = elder[0].attributes
-                        res.render('elder',{elder:elder})
+                    if(parse.User.current()){
+                        if(req.get('content-type') == 'application/json'){
+                            return res.status(200).json({
+                                payload:elder,
+                                session:parse.User.current()._sessionToken
+                            })
+                        } else {
+                            elder = elder[0].attributes
+                            res.render('elder',{elder:elder})
+                        }
+                    }else{
+                        res.redirect('/users/login');
                     }
                 }
             })
