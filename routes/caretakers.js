@@ -2,17 +2,10 @@ var express = require('express');
 var router = express.Router();
 var parse = require('parse').Parse;
 
-router.post('/:username/setup', function(req, res, next){
-    var username = req.params.username;
-    var caretaker = parse.User.current();
-
-    if (caretaker.username != username){
-        return res.redirect('error', {message:"Access Denied"})
-    }
+router.post('/:username/setupCaretaker', function(req, res, next){
+    
     var elderUsername = req.body.username;
     var elderPhone = req.body.phone;
-
-
 
     var elderQuery = new parse.Query(parse.User);
     elderQuery.equalTo("username",elderUsername);
@@ -28,6 +21,13 @@ router.post('/:username/setup', function(req, res, next){
 })
 
 router.get('/:username/setupCaretaker', function(req,res,next){
+    var username = req.params.username;
+    var caretaker = parse.User.current();
+
+    if (caretaker.username != username){
+        return res.redirect('error', {message:"Access Denied"})
+    }
+
     console.log(req.params.username)
     var username = req.params.username
     var query = new parse.Query(parse.User);
