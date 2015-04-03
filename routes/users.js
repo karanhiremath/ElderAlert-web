@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var parse = require('parse').Parse;
+var Caretaker = parse.Object.extend('Caretaker')
+
 
 var Geofence = require('./geofence');
 
@@ -44,37 +46,7 @@ router.get('/signup',function(req,res,next){
 })
 
 
-router.post('/updateGeofence/:username', function(req, res){
-    var username = req.params.username;
-    console.log(username);
-    var query = new parse.Query(parse.User);
-    query.equalTo("username", username);
-    query.first({
-      success: function(user) {
-        //use
-        console.log(user);
-        var geofence = Geofence.spawn(req.body.latitude, req.body.longitude, req.body.radius);
-        user.set("geofence", geofence);
-        user.set("name", "test2");
-        user.save(null, {
-            success: function(user) {
-            // The object was saved successfully.
-                console.log(user);
-            },
-            error: function(user, error) {
-            console.log(error);
-            }
-        })
-      },
-      error: function(user, error) {
 
-        console.log(error);
-        // The object was not retrieved successfully.
-        // error is a Parse.Error with an error code and message.
-      }
-    })
-
-});
 
 
 router.post('/login', function(req,res,next){
@@ -89,7 +61,7 @@ router.post('/login', function(req,res,next){
     parse.User.logIn(username, password, {
         success: function(user) {
             if (req.is('json')) {
-                
+                console.log("json response");
                 return res.status(200).json({
                     payload:parse.User.current(),
                     session:parse.User.current()._sessionToken
@@ -99,9 +71,29 @@ router.post('/login', function(req,res,next){
                 user = user.attributes
                 console.log(user)
                 if(user.role=='caretaker'){
-                    res.redirect('/caretakers/'+user.username);    
+                    console.log("redirecting");
+                    var caretakerQuery = new parse.Query(Caretaker);
+                    caretakerQuery.equalTo("user",user);
+                    caretakerQuery.find({
+                        success: function(caretakers) {
+                            if(caretakers[0]){
+                                console.log("rendering caretaker + user");
+                                console.log(caretakers[0].attributes);
+                                console.log(user);
+                                res.render('caretaker',
+                                {
+                                    user: user,
+                                    caretaker: caretakers[0].attributes,
+                                    test: "test",
+                                    topError:"",
+                                    addError:""
+                                });
+                            }
+                          }
+                        });
                 }else if(user.role=='elder'){
                     res.redirect('/elders/'+user.username)
+                    return;
                 }
                 
             }
@@ -123,7 +115,13 @@ router.get('/:username', function(req,res,next){
     query.equalTo("username",username);
     query.find({
         success: function(user) {
-            res.render('user',{user: user[0].attributes});
+            console.log(user[0].attributes)
+            if(user.role == "elder") {
+                res.redirect("/elders/"+user[0].attributes.username);    
+            } else {
+              console.log("redirecting");
+                res.redirect("/caretakers/"+user[0].attributes.username);    
+            }
         }
     })
 })

@@ -82,7 +82,7 @@ router.post('/:username', function(req, res, next){
 })
 
 router.get('/:username', function(req,res,next){
-
+    console.log("got to redirect");
     var username = req.params.username;
     
 
@@ -105,22 +105,31 @@ router.get('/:username', function(req,res,next){
     query.find({
         success: function(user) {
             user = user[0].attributes
-
-
             var caretakerQuery = new parse.Query(Caretaker);
             caretakerQuery.equalTo("user",user);
             caretakerQuery.find({
                 success: function(caretakers) {
                     if(caretakers[0]){
                         var caretaker = caretakers[0].attributes
-                        
-                        res.render('caretaker',
-                        {
-                            user:user,
-                            caretaker:caretaker,
-                            topError:"",
-                            addError:""
-                        });
+
+                        if(req.get('Content-type')=="application/json"){
+                                if(parse.User.current()) {
+                                   return res.status(200).json({
+                                        payload:user,
+                                        session:parse.User.current()._sessionToken
+                                    })
+                               }
+                        }else{
+                            console.log("rendering caretaker + user");
+                            console.log(caretaker);
+                            res.render('caretaker',
+                            {
+                                caretaker:caretaker,
+                                topError:"",
+                                addError:""
+                            });
+                        }
+
                     }else {
                         var caretaker = new Caretaker();
                         caretaker.set("user",user)
@@ -149,5 +158,9 @@ router.get('/:username', function(req,res,next){
         }
     })
 })
+
+
+
+
 
 module.exports = router

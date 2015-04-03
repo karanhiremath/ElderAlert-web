@@ -47,3 +47,19 @@ h3.label{
 .radio-inline{
 	margin-left:10px;
 }
+
+h3{
+	font-size:18px;
+}
+
+#addelderpanel{
+	width:375px;
+}
+
+.panel-heading{
+	font-size:18px;
+}
+
+.panel-body{
+	padding:5px;
+}
