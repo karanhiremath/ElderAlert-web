@@ -115,6 +115,7 @@ router.get('/:username', function(req,res,next){
                         var caretaker = caretakers[0].attributes
                         res.render('caretaker',
                         {
+                            user:user,
                             caretaker:caretaker,
                             topError:"",
                             addError:""
