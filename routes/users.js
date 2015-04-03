@@ -26,9 +26,9 @@ router.post('/signup', function(req, res, next) {
   user.signUp(null,{
     success: function(user){
         if (user.attributes.role == 'caretaker') {
-            res.redirect("/caretakers/"+user.attributes.username+"/setup");    
+            res.redirect("/caretakers/"+user.attributes.username+"/setupCaretaker");    
         }else if(user.attributes.role == 'elders') {
-            res.redirect("/elders/"+user.attributes.username+"/setup");    
+            res.redirect("/elders/"+user.attributes.username);    
         }
         
     },
@@ -88,7 +88,6 @@ router.post('/login', function(req,res,next){
 
     parse.User.logIn(username, password, {
         success: function(user) {
-            console.log(req.is('json'))
             if (req.is('json')) {
                 
                 return res.status(200).json({
