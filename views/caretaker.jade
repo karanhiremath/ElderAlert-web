@@ -2,24 +2,23 @@ extends layout
 
 block content
     h1= "Welcome " + user.username + "!"
-
-    h2 Your Elders
-    
-    for item in elders
-        h3= item
-        .col-md-4.col-sm-6.col-xs-12
-        iframe(width='300', height='200', frameborder='0', style='border:0', src='https://www.google.com/maps/embed/v1/place?key=AIzaSyD-UQS0FGNGKHaeJ-ZFayMwFCcs4xzVJOw\&q=Space+Needle,Seattle+WA')
-        form(method="post", action='/elders/'+ item + '/updateGeofence')
-            h3.label Latitude*
-            input.form-control(type="number", name="latitude").required
-            h3.label Longitude*
-            input.form-control(type="number", name="longitude").required
-            br
-            h3.label Radius*
-            input.form-control(type="number", name="radius").required
-            br
-            button.btn.btn-lg.btn-primary.btn-block(type='submit') Update Geofence
-    .col-md-4.col-sm-6.col-xs-12
+    if(elders)
+      h2 Your Elders
+      for item in elders
+          h3= item
+          .col-md-4.col-sm-6.col-xs-12
+          iframe(width='300', height='200', frameborder='0', style='border:0', src='https://www.google.com/maps/embed/v1/place?key=AIzaSyD-UQS0FGNGKHaeJ-ZFayMwFCcs4xzVJOw\&q=Space+Needle,Seattle+WA')
+          form(method="post", action='/elders/'+ item + '/updateGeofence')
+              h3.label Latitude*
+              input.form-control(type="number", name="latitude").required
+              h3.label Longitude*
+              input.form-control(type="number", name="longitude").required
+              br
+              h3.label Radius*
+              input.form-control(type="number", name="radius").required
+              br
+              button.btn.btn-lg.btn-primary.btn-block(type='submit') Update Geofence
+      .col-md-4.col-sm-6.col-xs-12
 
 
 

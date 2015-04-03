@@ -97,7 +97,6 @@ router.get('/:username', function(req,res,next){
                             if(req.get('Content-type')=="application/json"){
                                return res.status(200).json({
                                     payload:elder,
-                           
                                 })
                             }else{
                                 res.render('elder',{

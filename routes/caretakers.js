@@ -121,11 +121,15 @@ router.get('/:username', function(req,res,next){
                                }
                         }else{
                             
-                            elders = caretaker.elders
-                            console.log(elders.length)
+                            user = caretaker.user;
+                            elders = caretaker.elders;
+                            
+                            if(elders.length < 1){
+                                elder = []
+                            }
                             res.render('caretaker',
                             {
-                                user:caretaker.user,
+                                user:user,
                                 caretaker:caretaker,
                                 elders:elders,
                                 topError:"",
