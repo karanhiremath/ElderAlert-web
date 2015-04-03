@@ -14,7 +14,7 @@ router.post('/:username/setup', function(req, res, next){
 
 })
 
-router.get('/:username/setup', function(req,res,next){
+router.get('/:username', function(req,res,next){
     console.log(req.params.username)
     var username = req.params.username
     var query = new parse.Query(parse.User);
@@ -45,7 +45,7 @@ router.get('/:username/setup', function(req,res,next){
                             success: function(elder) {
                                 elder = elder.attributes
                                 console.log(elder)
-                                res.render('setupElder',{elder:elder, error:""});
+                                res.render('elder',{elder:elder, error:""});
                             }
                         })    
                     }

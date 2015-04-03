@@ -2,7 +2,9 @@ var express = require('express');
 var router = express.Router();
 var parse = require('parse').Parse;
 
-router.post('/:username/setupCaretaker', function(req, res, next){
+var Caretaker = parse.Object.extend('Caretaker')
+
+router.post('/:username', function(req, res, next){
     
     var elderUsername = req.body.username;
     var elderPhone = req.body.phone;
@@ -12,7 +14,7 @@ router.post('/:username/setupCaretaker', function(req, res, next){
     elderQuery.equalTo("phone",elderPhone);
     elderQuery.find({
         success: function(elder) {
-            console.log("here")
+            
             
         },
         error: function(elder,err) {
@@ -23,7 +25,9 @@ router.post('/:username/setupCaretaker', function(req, res, next){
     
 })
 
-router.get('/:username/setupCaretaker', function(req,res,next){
+router.get('/:username', function(req,res,next){
+    console.log('here')
+
     var username = req.params.username;
     var caretaker = parse.User.current();
 
@@ -40,7 +44,9 @@ router.get('/:username/setupCaretaker', function(req,res,next){
             console.log(user)
             user = user[0].attributes
 
-            res.render('setupCaretaker',{user:user, error:""});
+
+
+            res.render('caretaker',{user:user, error:""});
         }
     })
 })
