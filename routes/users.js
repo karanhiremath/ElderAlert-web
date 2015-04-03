@@ -88,6 +88,7 @@ router.post('/login', function(req,res,next){
 
     parse.User.logIn(username, password, {
         success: function(user) {
+            console.log(req.is('json'))
             if (req.is('json')) {
                 
                 return res.status(200).json({

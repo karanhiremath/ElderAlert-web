@@ -71,7 +71,9 @@ router.get('/:username',function(req,res,next){
             query.equalTo("user",user);
             query.find({
                 success: function(elder) {
-                    if(req.is('json')){
+                    
+                    if(req.get('content-type') == 'application/json'){
+                        console.log("here")
                         return res.status(200).json({
                             payload:elder,
                             session:parse.User.current()._sessionToken
