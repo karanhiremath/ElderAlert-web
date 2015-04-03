@@ -44,37 +44,7 @@ router.get('/signup',function(req,res,next){
 })
 
 
-router.post('/updateGeofence/:username', function(req, res){
-    var username = req.params.username;
-    console.log(username);
-    var query = new parse.Query(parse.User);
-    query.equalTo("username", username);
-    query.first({
-      success: function(user) {
-        //use
-        console.log(user);
-        var geofence = Geofence.spawn(req.body.latitude, req.body.longitude, req.body.radius);
-        user.set("geofence", geofence);
-        user.set("name", "test2");
-        user.save(null, {
-            success: function(user) {
-            // The object was saved successfully.
-                console.log(user);
-            },
-            error: function(user, error) {
-            console.log(error);
-            }
-        })
-      },
-      error: function(user, error) {
 
-        console.log(error);
-        // The object was not retrieved successfully.
-        // error is a Parse.Error with an error code and message.
-      }
-    })
-
-});
 
 
 router.post('/login', function(req,res,next){
@@ -115,7 +85,12 @@ router.get('/:username', function(req,res,next){
     query.equalTo("username",username);
     query.find({
         success: function(user) {
-            res.render('user',{user: user[0].attributes});
+            console.log(user[0].attributes)
+            if(user.role == "elder") {
+                res.redirect("/elders/"+user[0].attributes.username);    
+            } else {
+                res.redirect("/caretakers/"+user[0].attributes.username);    
+            }
         }
     })
 })

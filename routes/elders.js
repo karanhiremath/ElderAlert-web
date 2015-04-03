@@ -78,4 +78,36 @@ router.get('/:username',function(req,res,next){
         }
     })
 })
+
+router.post('/:username/updateGeofence', function(req, res){
+    var username = req.params.username;
+    console.log(username);
+    var query = new parse.Query(parse.User);
+    query.equalTo("username", username);
+    query.first({
+      success: function(user) {
+        //use
+        console.log(user);
+        var geofence = Geofence.spawn(req.body.latitude, req.body.longitude, req.body.radius);
+        user.set("geofence", geofence);
+        user.set("name", "test2");
+        user.save(null, {
+            success: function(user) {
+            // The object was saved successfully.
+                console.log(user);
+            },
+            error: function(user, error) {
+            console.log(error);
+            }
+        });
+      },
+      error: function(user, error) {
+
+        console.log(error);
+        // The object was not retrieved successfully.
+        // error is a Parse.Error with an error code and message.
+      }
+    });
+});
+
 module.exports = router;
