@@ -30,9 +30,6 @@ router.get('/:username/setupCaretaker', function(req,res,next){
     if (!caretaker) {
         res.redirect('/users/login');
     }
-    if (caretaker.username != username){
-        return res.render('error', {message:"Access Denied"})
-    }
 
     console.log(req.params.username)
     var username = req.params.username
