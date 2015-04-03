@@ -86,7 +86,6 @@ router.get('/:username', function(req,res,next){
     
     var username = req.params.username;
 
-    var username = req.params.username
     var query = new parse.Query(parse.User);
     query.equalTo("username",username);
     query.find({
@@ -152,7 +151,19 @@ router.get('/:username', function(req,res,next){
     })
 })
 
+router.post('/',function(req,res,next){
+    var caretakers = req.body.caretakers;
 
+    var query = new parse.Query(Caretaker);
+    query.containedIn("user.username",caretakers);
+    query.find({
+        success: function(caretakers){
+            return res.status(200).json({
+                payload:caretakers
+            })
+        }
+    })
+})
 
 
 
