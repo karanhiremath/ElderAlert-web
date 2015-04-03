@@ -12,8 +12,11 @@ router.post('/:username/setupCaretaker', function(req, res, next){
     elderQuery.equalTo("phone",elderPhone);
     elderQuery.find({
         success: function(elder) {
-            console.log(caretaker)
-            console.log(elder)
+            console.log("here")
+            
+        },
+        error: function(elder,err) {
+            console.log("ERROR")
         }
     })
     
@@ -25,10 +28,10 @@ router.get('/:username/setupCaretaker', function(req,res,next){
     var caretaker = parse.User.current();
 
     if (!caretaker) {
-        return res.render('login',{"error":"You must be logged in to access that page!"});
+        res.redirect('/users/login');
     }
     if (caretaker.username != username){
-        return res.redirect('error', {message:"Access Denied"})
+        return res.render('error', {message:"Access Denied"})
     }
 
     console.log(req.params.username)

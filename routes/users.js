@@ -89,13 +89,17 @@ router.post('/login', function(req,res,next){
     parse.User.logIn(username, password, {
         success: function(user) {
             if (req.is('json')) {
+                
                 return res.status(200).json({
                     payload:parse.User.current(),
                     session:parse.User.current()._sessionToken
 
                 })
             }else {
-                res.redirect(user.attributes.username);
+                if(user.role=='caretaker'){
+                    res.redirect(user.attributes.username);    
+                }
+                
             }
         },
         error: function(user,error){

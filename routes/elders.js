@@ -67,7 +67,7 @@ router.get('/:username',function(req,res,next){
         success: function(user) {
             console.log(user)
             user = user[0].attributes
-            var query = new parse.Query(parse.Elder);
+            var query = new parse.Query(Elder);
             query.equalTo("user",user);
             query.find({
                 success: function(elder) {
