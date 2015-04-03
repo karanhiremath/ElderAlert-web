@@ -13,7 +13,7 @@ router.post('/signup', function(req, res, next) {
   if (!email || !password || !username || !phone) {
     res.render('error',{error:"Please complete all required items"})
   }
-  console.log("here")
+  console.log("here");
 
   var user = new parse.User();
   user.set("email",email);
@@ -35,6 +35,25 @@ router.post('/signup', function(req, res, next) {
 router.get('/signup',function(req,res,next){
     res.render('signup')
 })
+
+
+router.updateGeofence('/updateGeofence/:id', function(req, res){
+    user_id = req.params.id;
+    //todo: add query to get the elder associated with the id
+
+    var currentUser = Parse.User.current();
+    var geofence = new Geofence(req.body.latitude, req.body.longitude, req.body.radius);
+    currentUser.set("geofence", geofence);
+    currentUser.save(null, {
+        success: function(user) {
+        // The object was saved successfully.
+        },
+        error: function(user, error) {
+        console.log(error);
+        }
+    })
+});
+
 
 router.post('/login', function(req,res,next){
     console.log(req.body)
