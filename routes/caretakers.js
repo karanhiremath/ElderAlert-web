@@ -160,6 +160,7 @@ router.post('/',function(req,res,next){
     query.containedIn("user.username",caretakers);
     query.find({
         success: function(caretakers){
+            console.log(caretakers)
             return res.status(200).json({
                 payload:caretakers
             })
