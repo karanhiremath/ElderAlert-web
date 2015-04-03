@@ -4,6 +4,7 @@ var parse = require('parse').Parse;
 
 var Elder = parse.Object.extend('Elder')
 var Caretaker = parse.Object.extend('Caretaker')
+var Geofence = require('./geofence');
 
 
 
@@ -140,7 +141,7 @@ router.post('/:username/updateGeofence', function(req, res){
       success: function(user) {
         //use
         console.log(user);
-        var geofence = Geofence.spawn(req.body.latitude, req.body.longitude, req.body.radius);
+        var geofence = Geofence.spawn(parseFloat(req.body.latitude), parseFloat(req.body.longitude), parseFloat(req.body.radius));
         user.set("geofence", geofence);
         user.set("name", "test2");
         user.save(null, {
@@ -156,6 +157,7 @@ router.post('/:username/updateGeofence', function(req, res){
       error: function(user, error) {
 
         console.log(error);
+        res.send(500);
         // The object was not retrieved successfully.
         // error is a Parse.Error with an error code and message.
       }

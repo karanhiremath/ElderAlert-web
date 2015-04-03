@@ -82,7 +82,7 @@ router.post('/:username', function(req, res, next){
 })
 
 router.get('/:username', function(req,res,next){
-
+    console.log("got to redirect");
     var username = req.params.username;
     
 
@@ -105,8 +105,6 @@ router.get('/:username', function(req,res,next){
     query.find({
         success: function(user) {
             user = user[0].attributes
-
-
             var caretakerQuery = new parse.Query(Caretaker);
             caretakerQuery.equalTo("user",user);
             caretakerQuery.find({
@@ -121,9 +119,10 @@ router.get('/:username', function(req,res,next){
                                     })
                                }
                         }else{
+                            console.log("rendering caretaker + user");
+                            console.log(caretaker);
                             res.render('caretaker',
                             {
-                                user:user,
                                 caretaker:caretaker,
                                 topError:"",
                                 addError:""
@@ -159,26 +158,6 @@ router.get('/:username', function(req,res,next){
 })
 
 
-router.get('/:username',function(req,res,next){
-    console.log(req.params.username)
-    var username = req.params.username
-    var query = new parse.Query(parse.User);
-    query.equalTo("username",username);
-    query.find({
-        success: function(user) {
-            console.log(user)
-            user = user[0].attributes
-            var query = new parse.Query(parse.Caretaker);
-            query.equalTo("user",user);
-            query.find({
-                success: function(caretaker) {
-                    caretaker = caretaker[0].attributes
-                    res.render('caretaker',{caretaker:caretaker})
-                }
-            })
-        }
-    })
-})
 
 
 

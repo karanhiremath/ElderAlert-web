@@ -1,27 +1,44 @@
 extends layout
 
 block content
-	h1= user.username
-	h3= user.email
-	h3= user.phone
-	h4= topError
-	.row
-		.col-md-4.col-sm-6.col-xs-12
-			if(user.role=='caretaker')
-			.panel.panel-default#addelderpanel
-			.panel-heading Add an Elder to your account:
-			.panel-body
-			h3 = addError
-			form(method="post")
-				h3.label Elder Username*
-				input.form-control(type="text", name="username").required
-				h3.label Elder Phone Number*
-				input.form-control(type="text", name="phone").required
-				br
-				button.btn.btn-lg.btn-primary.btn-block(type='submit') Add Elder
-		.col-md-4.col-sm-6.col-xs-12
-			iframe(width='450', height='450', frameborder='0', style='border:0', src='https://www.google.com/maps/embed/v1/place?key=AIzaSyD-UQS0FGNGKHaeJ-ZFayMwFCcs4xzVJOw\
-  &q=Space+Needle,Seattle+WA')
-	
+    h1= "Welcome " + user.username + "!"
+
+    h2 Your Elders
+    for item in caretaker.elders
+        h3= item
+        .col-md-4.col-sm-6.col-xs-12
+        iframe(width='300', height='200', frameborder='0', style='border:0', src='https://www.google.com/maps/embed/v1/place?key=AIzaSyD-UQS0FGNGKHaeJ-ZFayMwFCcs4xzVJOw\&q=Space+Needle,Seattle+WA')
+        form(method="post", action='/elders/'+ item + '/updateGeofence')
+            h3.label Latitude*
+            input.form-control(type="number", name="latitude").required
+            h3.label Longitude*
+            input.form-control(type="number", name="longitude").required
+            br
+            h3.label Radius*
+            input.form-control(type="number", name="radius").required
+            br
+            button.btn.btn-lg.btn-primary.btn-block(type='submit') Update Geofence
+    .col-md-4.col-sm-6.col-xs-12
+
+
+
+    .row
+        .col-md-4.col-sm-6.col-xs-12
+            if(user.role=='caretaker')
+            .panel.panel-default#addelderpanel
+            .panel-heading Add an Elder to your account:
+            .panel-body
+            h3= addError
+            form(method="post")
+                h3.label Elder Username*
+                input.form-control(type="text", name="username").required
+                h3.label Elder Phone Number*
+                input.form-control(type="text", name="phone").required
+                br
+                button.btn.btn-lg.btn-primary.btn-block(type='submit') Add Elder
+        .col-md-4.col-sm-6.col-xs-12
+
+
+
 
 //refer to this for map use https://developers.google.com/maps/documentation/embed/guide#place_mode
