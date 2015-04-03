@@ -4,10 +4,11 @@ block content
   h1= user.username
   h3= user.email
   h3= user.phone
-  
+  h4= topError
+  for()
   if(user.role=='caretaker')
     h2 Add Elder
-    h3= error
+    h3= addError
     form(method="post")
         h3.label Elder Username*
         input(type="text", name="username").required

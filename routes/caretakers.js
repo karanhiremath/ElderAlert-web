@@ -6,6 +6,9 @@ var Caretaker = parse.Object.extend('Caretaker')
 
 router.post('/:username', function(req, res, next){
     
+    var username = req.params.username;
+    var caretaker = parse.User.current();
+
     var elderUsername = req.body.username;
     var elderPhone = req.body.phone;
 
@@ -26,16 +29,23 @@ router.post('/:username', function(req, res, next){
 })
 
 router.get('/:username', function(req,res,next){
-    console.log('here')
 
     var username = req.params.username;
-    var caretaker = parse.User.current();
+    
 
-    if (!caretaker) {
+    if (!parse.User.current()) {
         res.redirect('/users/login');
     }
 
-    console.log(req.params.username)
+    var caretaker = parse.User.current().attributes;
+    if(caretaker.username != username) {
+        res.render('caretaker',
+            {
+                user:caretaker,
+                topError:"You do not have permission to view that caretaker!",
+                addError:""
+            });
+    }
     var username = req.params.username
     var query = new parse.Query(parse.User);
     query.equalTo("username",username);
