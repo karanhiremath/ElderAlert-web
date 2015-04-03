@@ -49,10 +49,10 @@ router.post('/:username', function(req, res, next){
                                     var elderObjQuery = new parse.Query(Elder);
                                     elderObjQuery.get(elderId,{
                                         success: function(elder) {
-                                            console.log(elder.get("caretaker_requests"));
-                                            console.log(caretaker.get("elder_requests"));
-                                            elder.addUnique("caretaker_requests",caretaker);
-                                            caretaker.addUnique("elder_requests",elder);
+                                            console.log(elder.get("user").username);
+                                            console.log(caretaker.get("user").username);
+                                            elder.addUnique("caretaker_requests",caretaker.get("user").username);
+                                            caretaker.addUnique("elder_requests",elder.get("user").username);
                                             elder.save();
                                             caretaker.save();
                                         },
