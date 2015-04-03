@@ -152,6 +152,7 @@ router.get('/:username', function(req,res,next){
 })
 
 router.post('/',function(req,res,next){
+    console.log("HERE")
     var caretakers = req.body.caretakers;
 
     console.log(caretakers);
