@@ -91,9 +91,11 @@ router.get('/:username', function(req,res,next){
                 elderQuery.find({
                     success: function(elder) {
                         if (elder[0]){
+
                             elder = elder[0].attributes
+                            console.log(elder)
                             user = elder.user
-                            
+                            console.log(user)
                             if(req.get('Content-type')=="application/json"){
                                return res.status(200).json({
                                     payload:elder,
