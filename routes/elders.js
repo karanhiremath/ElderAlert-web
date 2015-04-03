@@ -71,8 +71,15 @@ router.get('/:username',function(req,res,next){
             query.equalTo("user",user);
             query.find({
                 success: function(elder) {
-                    elder = elder[0].attributes
-                    res.render('elder',{elder:elder})
+                    if(req.is('json')){
+                        return res.status(200).json({
+                            payload:elder,
+                            session:parse.User.current()._sessionToken
+                        })
+                    } else {
+                        elder = elder[0].attributes
+                        res.render('elder',{elder:elder})
+                    }
                 }
             })
         }
