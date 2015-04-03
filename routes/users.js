@@ -97,6 +97,7 @@ router.post('/login', function(req,res,next){
                 })
             }else {
                 user = user.attributes
+                console.log(user)
                 if(user.role=='caretaker'){
                     res.redirect('/caretakers/'+user.username);    
                 }else if(user.role=='elder'){

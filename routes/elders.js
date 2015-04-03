@@ -76,6 +76,7 @@ router.post('/:username', function(req, res, next){
 
 
 router.get('/:username', function(req,res,next){
+
     var username = req.params.username
     var query = new parse.Query(parse.User);
     query.equalTo("username",username);
@@ -91,10 +92,18 @@ router.get('/:username', function(req,res,next){
                         if (elder[0]){
                             elder = elder[0].attributes
                             user = elder.user
-                            console.log(user)
-                            res.render('elder',{
+                            
+                            if(req.get('Content-type')=="application/json"){
+                               return res.status(200).json({
+                                    payload:elder,
+                           
+                                })
+                            }else{
+                                res.render('elder',{
                                 user:user,
-                                elder:elder})
+                                elder:elder})    
+                            }
+                            
                         }else {
                             var Elder = parse.Object.extend('Elder')
 
