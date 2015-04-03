@@ -113,22 +113,14 @@ router.get('/:username', function(req,res,next){
                 success: function(caretakers) {
                     if(caretakers[0]){
                         var caretaker = caretakers[0].attributes
-                        if(req.get('Content-type')=="application/json"){
-                                if(parse.User.current()) {
-                                   return res.status(200).json({
-                                        payload:user,
-                                        session:parse.User.current()._sessionToken
-                                    })
-                               }
-                        }else{
-                            res.render('caretaker',
-                            {
-                                user:user,
-                                caretaker:caretaker,
-                                topError:"",
-                                addError:""
-                            });
-                        }
+                        
+                        res.render('caretaker',
+                        {
+                            user:user,
+                            caretaker:caretaker,
+                            topError:"",
+                            addError:""
+                        });
                     }else {
                         var caretaker = new Caretaker();
                         caretaker.set("user",user)
