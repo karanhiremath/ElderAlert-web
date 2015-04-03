@@ -3,8 +3,68 @@ var router = express.Router();
 var parse = require('parse').Parse;
 
 var Elder = parse.Object.extend('Elder')
+var Caretaker = parse.Object.extend('Caretaker')
 
 
+
+router.post('/confirm', function(req,res,next){
+    
+    var elderUsername = req.body.elder;
+    var caretakerUsername = req.body.caretaker;
+
+    var elderIdQuery = new parse.Query(Elder);
+    elderIdQuery.equalTo("user.username",elderUsername);
+    elderIdQuery.find({
+        success: function(elders) {
+            if(elders.length > 0){
+
+                var elderId = elders[0].id 
+
+                var elderObjQuery = new parse.Query(Elder);
+                elderObjQuery.get(elderId,{
+                    success: function(elder) {
+
+                        var caretakerIdQuery = new parse.Query(Caretaker)
+                        caretakerIdQuery.equalTo("user.username",caretakerUsername);
+                        caretakerIdQuery.find({
+                            success: function(caretakers){
+                                
+                                if(caretakers.length > 0){
+                                    var caretakerId = caretakers[0].id 
+
+                                    var caretakerObjQuery = new parse.Query(Caretaker);
+                                    caretakerObjQuery.get(caretakerId,{
+                                        success: function(caretaker) {
+                                            console.log("here")
+                                            var caretaker_requests = elder.get("caretaker_requests");
+                                            var elder_requests = caretaker.get("elder_requests");
+                                            console.log(caretaker_requests)
+                                            console.log(elder_requests)
+                                            caretaker_requests.splice(caretaker_requests.indexOf(elderUsername),1)
+                                            elder_requests.splice(elder_requests.indexOf(caretakerUsername),1)
+                                            console.log(caretaker_requests)
+                                            console.log(elder_requests)
+
+                                            elder.addUnique("caretakers",caretakerUsername);
+                                            caretaker.addUnique("elders",elderUsername);
+                                            elder.set("caretaker_requests",caretaker_requests);
+                                            caretaker.set("elder_requests",elder_requests);
+
+                                            elder.save();
+                                            caretaker.save();
+
+                                            return res.send(200)
+                                        }
+                                    })
+                                }
+                            }
+                        })
+                    }
+                })
+            }
+        }
+    })
+})
 
 router.post('/:username', function(req, res, next){
     var username = req.params.username;
@@ -13,6 +73,7 @@ router.post('/:username', function(req, res, next){
     //returns list of caretaker objects
 
 })
+
 
 router.get('/:username', function(req,res,next){
     var username = req.params.username
@@ -61,49 +122,5 @@ router.get('/:username', function(req,res,next){
     })
 })
 
-router.post('/confirm', function(req,res,next){
-    var elderUsername = req.body.elder;
-    var caretakerUsername = req.body.caretaker;
-
-    var elderIdQuery = new parse.Query(Elder);
-    elderIdQuery.equalTo("user.username",elderUsername);
-    elderIdQuery.find({
-        success: function(elders) {
-            if(elders.length > 0){
-                var elderId = elders[0].id 
-
-                var elderObjQuery = new parse.Query(Elder);
-                elderObjQuery.get(elderId,{
-                    success: function(elder) {
-                        var caretakerIdQuery = new parse.Query(Caretaker)
-                        caretakerIdQuery.equalTo("user.username",elderUsername);
-                        caretakerIdQuery.find({
-                            success: function(caretakers){
-                                if(caretakers.length > 0){
-                                    var caretakerId = caretakers[0].id 
-
-                                    var caretakerObjQuery = new parse.Query(Caretaker);
-                                    caretakerObjQuery.get(caretakerId,{
-                                        success: function(caretaker) {
-                                            var caretaker_requests = elder.get("caretaker_requests");
-                                            var elder_requests = caretaker.get("elder_requests");
-                                            console.log(caretaker_requests)
-                                            console.log(elder_requests)
-                                            caretaker_requests.splice(caretaker_requests.indexOf(elderUsername),1)
-                                            elder_requests.splice(elder_requests.indexOf(caretakerUsername),1)
-                                            console.log(caretaker_requests)
-                                            console.log(elder_requests)
-
-                                        }
-                                    })
-                                }
-                            }
-                        })
-                    }
-                })
-            }
-        }
-    })
-})
 
 module.exports = router;
