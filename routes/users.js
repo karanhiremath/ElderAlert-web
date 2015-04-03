@@ -1,10 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var parse = require('parse').Parse;
-var caretaker = require('./caretaker');
-var elder = require('./elder');
-
-var app = express()
 
 router.post('/signup', function(req, res, next) {
 
@@ -29,7 +25,9 @@ router.post('/signup', function(req, res, next) {
   user.signUp(null,{
     success: function(user){
         if (user.attributes.role == 'caretaker') {
-            res.redirect(user.attributes.username+"/caretaker/setup");    
+            res.redirect("/caretakers/"+user.attributes.username+"/setup");    
+        }else if(user.attributes.role == 'elders') {
+            res.redirect("/elders/"+user.attributes.username+"/setup");    
         }
         
     },
@@ -87,7 +85,5 @@ router.get('/:username', function(req,res,next){
     })
 })
 
-app.use('/:username/caretaker', caretaker)
-app.use('/:username/elder', elder)
 
 module.exports = router;
