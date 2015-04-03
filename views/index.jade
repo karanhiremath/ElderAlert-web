@@ -1,10 +1,28 @@
-extends layout
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    meta(name='description', content='')
+    meta(name='author', content='')
+    title Narrow Jumbotron Template for Bootstrap
+    link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css", rel="stylesheet")
+    // Bootstrap core CSS
+    // Custom styles for this template
+    link(rel='stylesheet', href='/stylesheets/index.css')
+  body
+    .container
+      .header
+        h3.text-muted ElderAlert
+      .jumbotron
+        h1 Welcome to ElderAlert
+        p.lead
+          |Keep track of your loved ones. To get started, Sign Up or Log In.
+        p
+          a.btn.btn-lg.btn-success(href='/users/signup', role='button') Sign Up
+          a.btn.btn-lg.btn-info(href='/users/login', role='button') Log in
 
-block content
-  h1= title
-  h2 Welcome to #{title}
-  h3
-    a(href='/users/signup') Signup
-    |  | 
-    a(href='/users/login') Login
-
+      .footer
+        p &copy; Group26 2015
+  

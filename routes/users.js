@@ -26,9 +26,9 @@ router.post('/signup', function(req, res, next) {
   user.signUp(null,{
     success: function(user){
         if (user.attributes.role == 'caretaker') {
-            res.redirect("/caretakers/"+user.attributes.username+"/setup");    
-        }else if(user.attributes.role == 'elders') {
-            res.redirect("/elders/"+user.attributes.username+"/setup");    
+            res.redirect("/caretakers/"+user.attributes.username);    
+        }else if(user.attributes.role == 'elder') {
+            res.redirect("/elders/"+user.attributes.username);    
         }
         
     },
@@ -59,13 +59,21 @@ router.post('/login', function(req,res,next){
     parse.User.logIn(username, password, {
         success: function(user) {
             if (req.is('json')) {
+                
                 return res.status(200).json({
                     payload:parse.User.current(),
                     session:parse.User.current()._sessionToken
 
                 })
             }else {
-                res.redirect(user.attributes.username);
+                user = user.attributes
+                console.log(user)
+                if(user.role=='caretaker'){
+                    res.redirect('/caretakers/'+user.username);    
+                }else if(user.role=='elder'){
+                    res.redirect('/elders/'+user.username)
+                }
+                
             }
         },
         error: function(user,error){

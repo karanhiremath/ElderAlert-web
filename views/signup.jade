@@ -1,31 +1,26 @@
 extends layout
 
 block content
-    h1 Hello! 
-    h2 Welcome to ElderAlert. Register Now!
-    form(method="post")        
-        h3.label Username* 
-        input(type="text", name="username").required
-        h3.label Email* 
-        input(type="text", name="email").required
-        h3.label Password* 
-        input(type="password", name="password").required
-        h3.label Phone Number*
-        input(type="text", name="phone").required
-        .form-group
-            h3.label Are you a Caretaker or an Elder?
+  body
+    .container#inputcontainer
+      form.form-signin(role='form', method="post")
+        h2.form-singin-heading Please register below:
+        input.form-control(type='text', name="username", placeholder='Username', required='', autofocus='')
+        input.form-control(type='text', name="email", placeholder='Email', required='', autofocus='')
+        input.form-control(type='password', name='password', placeholder='Password', required='')
+        input.form-control(type='text', name='phone', placeholder='Phone Number', required='')
+        .form-group#caretakerorelder
+            h3.label#caretakerorelderprompt Are you a Caretaker or an Elder?
+            br
             label.radio-inline
               input#role1(type="radio", name="role", value="caretaker", checked="")
               | Caretaker
             label.radio-inline
               input#role2(type="radio", name="role", value="elder")
               | Elder
-        br
-        button(type="submit")#btn-login.btn.btn-primary.btn-large
-            |Register
-        div.clear-fix
-        div.btm-links
-            a(href='/login')#create-account Already Registered?
+        button.btn.btn-lg.btn-primary.btn-block(type='submit') Sign Up
+        h3 
+        a(href='/login')#create-account Already Registered?
 
 block scripts
     script(src='/vendor/jquery.min.js')
