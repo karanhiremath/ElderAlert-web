@@ -85,20 +85,7 @@ router.post('/:username', function(req, res, next){
 router.get('/:username', function(req,res,next){
     
     var username = req.params.username;
-    
-    if (!parse.User.current()) {
-        res.redirect('/users/login');
-    }
 
-    var caretaker = parse.User.current().attributes;
-    if(caretaker.username != username) {
-        res.render('caretaker',
-            {
-                user:caretaker,
-                topError:"You do not have permission to view that caretaker!",
-                addError:""
-            });
-    }
     var username = req.params.username
     var query = new parse.Query(parse.User);
     query.equalTo("username",username);
@@ -113,20 +100,17 @@ router.get('/:username', function(req,res,next){
                         var caretaker = caretakers[0].attributes
 
                         if(req.get('Content-type')=="application/json"){
-                                if(parse.User.current()) {
-                                   return res.status(200).json({
-                                        payload:user,
-                                        session:parse.User.current()._sessionToken
-                                    })
-                               }
+                                
+                               return res.status(200).json({
+                                    payload:caretaker,
+                                    
+                                })
+                               
                         }else{
-                            
+                            console.log(caretaker)    
                             user = caretaker.user;
+                            console.log(user)
                             elders = caretaker.elders;
-                            
-                            if(elders.length < 1){
-                                elder = []
-                            }
                             res.render('caretaker',
                             {
                                 user:user,
@@ -163,7 +147,7 @@ router.get('/:username', function(req,res,next){
             })
 
 
-            res.render('caretaker',{user:user, error:""});
+            // res.render('caretaker',{user:user, error:""});
         }
     })
 })
