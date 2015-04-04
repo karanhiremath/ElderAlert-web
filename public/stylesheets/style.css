@@ -118,6 +118,12 @@ body.h1{
 	padding-bottom:30px !important;
 }
 
+a#headname.navbar-brand {
+	font-size:30px;
+	padding-top:30px !important; 
+	padding-bottom:30px !important;
+}
+
 .navbar img{
 	display:block;
 }
