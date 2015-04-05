@@ -69,28 +69,11 @@ router.post('/login', function(req,res,next){
                 })
             }else {
                 user = user.attributes
+                
+
                 console.log(user)
                 if(user.role=='caretaker'){
-                    console.log("redirecting");
-                    var caretakerQuery = new parse.Query(Caretaker);
-                    caretakerQuery.equalTo("user",user);
-                    caretakerQuery.find({
-                        success: function(caretakers) {
-                            if(caretakers[0]){
-                                console.log("rendering caretaker + user");
-                                console.log(caretakers[0].attributes);
-                                console.log(user);
-                                res.render('caretaker',
-                                {
-                                    user: user,
-                                    caretaker: caretakers[0].attributes,
-                                    test: "test",
-                                    topError:"",
-                                    addError:""
-                                });
-                            }
-                          }
-                        });
+                    res.redirect('/caretakers/'+user.username);    
                 }else if(user.role=='elder'){
                     res.redirect('/elders/'+user.username)
                     return;

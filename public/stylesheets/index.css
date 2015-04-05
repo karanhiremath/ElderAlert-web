@@ -11,3 +11,12 @@ body.h1{
 	font-size:30px;
 }
 
+.btn-green{
+	background:#16eeb6;
+	color:#ffffff;
+	border: solid #14E2AB 1px;
+}
+
+.btn-blue{
+
+}

@@ -1,5 +1,6 @@
 body {
-  padding: 50px;
+  padding: 95px;
+  font-family: 'Open Sans', sans-serif;
 }
 
 a {
@@ -10,11 +11,16 @@ a:visited{
 	text-decoration: none;
 }
 
-h1{
-	font-family: "Open Sans", sans-serif;}
+p{
+	font-family: 'Open Sans', sans-serif;
+}
+
+.jumbotron h1{
+	font-size:58px;
+}
 
 h2{
-  font: 24px "Lucida Grande", Helvetica, Arial, sans-serif;
+	font-size:24px;
 }
 
 #inputcontainer{
@@ -62,4 +68,68 @@ h3{
 
 .panel-body{
 	padding:5px;
+}
+
+.btn {
+  margin: 5px;
+}
+
+p.lead {
+  margin: 5px;
+  margin-bottom:10px;
+}
+
+body.h1{
+	font-size:30px;
+}
+
+.btn-green{
+	background:#16eeb6;
+	color:#ffffff;
+	border: solid #14E2AB 1px;
+}
+
+.btn-green:hover{
+	background:#0CDDAD;
+	color:#ffffff;
+	text-deciration:none;
+}
+
+.btn-blue{
+	background:#009ED9;
+	color:#ffffff;
+	border: solid #0097CE 1px;
+}
+
+.btn-blue:hover{
+	background:#0086C4;
+	color:#ffffff;
+	text-deciration:none;
+}
+
+.navbar {
+	min-height:80px !important;
+	background-color:#1C3041;
+	display:inline-block;
+}
+
+.navbar-nav > li > a {
+	padding-top:30px !important; 
+	padding-bottom:30px !important;
+}
+
+a#headname.navbar-brand {
+	font-size:30px;
+	padding-top:30px !important; 
+	padding-bottom:30px !important;
+}
+
+.navbar img{
+	display:block;
+}
+
+.navbar-brand{
+	padding-top:8px;
+	padding-bottom:10px;
+	padding-right:15px;
 }

@@ -9,9 +9,10 @@ router.post('/:username', function(req, res, next){
     
     var username = req.params.username;
 
-    if(!parse.User.current()) {
-        res.redirect('/users/login');
-    }
+    console.log("here")
+    // if(!parse.User.current()) {
+    //     res.redirect('/users/login');
+    // }
 
     var caretaker = parse.User.current().attributes;
 
@@ -56,7 +57,7 @@ router.post('/:username', function(req, res, next){
                                             elder.save();
                                             caretaker.save();
                                         },
-                                        elder: function(elder, error){
+                                        error: function(elder, error){
 
                                         }
                                     })
@@ -82,24 +83,9 @@ router.post('/:username', function(req, res, next){
 })
 
 router.get('/:username', function(req,res,next){
-    console.log("got to redirect");
-    var username = req.params.username;
     
+    var username = req.params.username;
 
-    if (!parse.User.current()) {
-        res.redirect('/users/login');
-    }
-
-    var caretaker = parse.User.current().attributes;
-    if(caretaker.username != username) {
-        res.render('caretaker',
-            {
-                user:caretaker,
-                topError:"You do not have permission to view that caretaker!",
-                addError:""
-            });
-    }
-    var username = req.params.username
     var query = new parse.Query(parse.User);
     query.equalTo("username",username);
     query.find({
@@ -111,23 +97,29 @@ router.get('/:username', function(req,res,next){
                 success: function(caretakers) {
                     if(caretakers[0]){
                         var caretaker = caretakers[0].attributes
+
                         if(req.get('Content-type')=="application/json"){
-                                if(parse.User.current()) {
-                                   return res.status(200).json({
-                                        payload:user,
-                                        session:parse.User.current()._sessionToken
-                                    })
-                               }
+                                
+                               return res.status(200).json({
+                                    payload:caretaker,
+                                    
+                                })
+                               
                         }else{
-                            console.log("rendering caretaker + user");
-                            console.log(caretaker);
+                            console.log(caretaker)    
+                            user = caretaker.user;
+                            console.log(user)
+                            elders = caretaker.elders;
                             res.render('caretaker',
                             {
+                                user:user,
                                 caretaker:caretaker,
+                                elders:elders,
                                 topError:"",
                                 addError:""
                             });
                         }
+
                     }else {
                         var caretaker = new Caretaker();
                         caretaker.set("user",user)
@@ -138,10 +130,12 @@ router.get('/:username', function(req,res,next){
                             success: function(caretaker) {
                                 caretaker = caretaker.attributes
                                 console.log(caretaker)
+                                elders = caretaker.elders
                                 res.render('caretaker',
                                 {
                                     user:user,
                                     caretaker:caretaker,
+                                    elders:elders,
                                     topError:"",
                                     addError:""
                                 });
@@ -152,12 +146,24 @@ router.get('/:username', function(req,res,next){
             })
 
 
-            res.render('caretaker',{user:user, error:""});
+            // res.render('caretaker',{user:user, error:""});
         }
     })
 })
 
+router.post('/',function(req,res,next){
+    var caretakers = req.body.caretakers;
 
+    var query = new parse.Query(Caretaker);
+    query.containedIn("user.username",caretakers);
+    query.find({
+        success: function(caretakers){
+            return res.status(200).json({
+                payload:caretakers
+            })
+        }
+    })
+})
 
 
 
