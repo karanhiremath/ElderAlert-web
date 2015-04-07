@@ -6,22 +6,31 @@ block content
       h2 Your Elders
       for item in elders
           h3= item
-          .col-md-4.col-sm-6.col-xs-12
-          iframe(width='300', height='200', frameborder='0', style='border:0', src='https://www.google.com/maps/embed/v1/place?key=AIzaSyD-UQS0FGNGKHaeJ-ZFayMwFCcs4xzVJOw\&q=Space+Needle,Seattle+WA')
-          form(method="post", action='/elders/'+ item + '/updateGeofence')
-              h3.label Latitude*
-              input.form-control(type="number", name="latitude").required
-              h3.label Longitude*
-              input.form-control(type="number", name="longitude").required
-              br
-              h3.label Radius*
-              input.form-control(type="number", name="radius").required
-              br
-              button.btn.btn-lg.btn-primary.btn-block(type='submit') Update Geofence
-      .col-md-4.col-sm-6.col-xs-12
+          .row
+              .col-md-4.col-sm-6.col-xs-12
+                iframe(width='300', height='200', frameborder='0', style='border:0', src='https://www.google.com/maps/embed/v1/place?key=AIzaSyD-UQS0FGNGKHaeJ-ZFayMwFCcs4xzVJOw\&q=Space+Needle,Seattle+WA')
+              .col-md-4.col-sm-6.col-xs-12
+                  form(method="post", action='/elders/'+ item + '/updateGeofence')
+                      h3.label Latitude*
+                      input.form-control(type="number", name="latitude").required
+                      h3.label Longitude*
+                      input.form-control(type="number", name="longitude").required
+                      br
+                      h3.label Radius*
+                      input.form-control(type="number", name="radius").required
+                      br
+                      button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Update Geofence
+              .col-md-4.col-sm-6.col-xs-12
+                h2 Trips
+                h3 Current Trips
+                h3 Upcoming Trips
+                h3 Trip Requests
 
-
+    br
+    hr    
     .row
+        .col-md-4.col-sm-6.col-xs-12
+            h2 Pending Elders
         .col-md-4.col-sm-6.col-xs-12
             if(user.role=='caretaker')
             .panel.panel-default#addelderpanel
@@ -34,9 +43,7 @@ block content
                 h3.label Elder Phone Number*
                 input.form-control(type="text", name="phone").required
                 br
-                button.btn.btn-lg.btn-primary.btn-block(type='submit') Add Elder
-        .col-md-4.col-sm-6.col-xs-12
-
+                button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Elder
 
 
 
