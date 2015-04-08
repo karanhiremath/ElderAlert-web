@@ -2,48 +2,110 @@ extends layout
 
 block content
     h1= "Welcome " + user.username + "!"
+    hr
+    .row
+        .col-xs-6#alertpanel
+            .panel.panel-blue
+                .panel-heading Ongoing Alerts
+                .panel-body
+                    h4 Alert: Elder has left geofence @ time
+                    h4 [Call 911] [Call Elder] [Dismiss]
+        .col-xs-6#alertpanel
+            .panel.panel-blue
+                .panel-heading Alert History
+                .panel-body
+                    h4 Alert: Elder has left geofence @ time
+                    h4 Alert: Elder has left geofence @ time
+    hr
     if(elders)
       h2 Your Elders
       for item in elders
-          h3= item
+            h3= item
           .row
               .col-md-4.col-sm-6.col-xs-12
-                iframe(width='300', height='200', frameborder='0', style='border:0', src='https://www.google.com/maps/embed/v1/place?key=AIzaSyD-UQS0FGNGKHaeJ-ZFayMwFCcs4xzVJOw\&q=Space+Needle,Seattle+WA')
+                .panel.with-nav-tabs.panel-default
+                    .panel-heading#with-tabs
+                        .navbar-text Location
+                        ul.nav.nav-tabs
+                            li.active
+                                a(href='#tab1loc', data-toggle='tab') Current
+                            li
+                                a(href='#tab2loc', data-toggle='tab') Daily
+                            li
+                                a(href='#tab3loc', data-toggle='tab') Weekly
+                    .panel-body
+                        .tab-content
+                            #tab1loc.tab-pane.fade.in.active
+                                iframe(width='405', height='300', frameborder='0', style='border:0', src='https://www.google.com/maps/embed/v1/place?key=AIzaSyD-UQS0FGNGKHaeJ-ZFayMwFCcs4xzVJOw\&q=Space+Needle,Seattle+WA')
+                            #tab2loc.tab-pane.fade
+                            #tab3loc.tab-pane.fade
+                        
               .col-md-4.col-sm-6.col-xs-12
-                  form(method="post", action='/elders/'+ item + '/updateGeofence')
-                      h3.label Latitude*
-                      input.form-control(type="number", name="latitude").required
-                      h3.label Longitude*
-                      input.form-control(type="number", name="longitude").required
-                      br
-                      h3.label Radius*
-                      input.form-control(type="number", name="radius").required
-                      br
-                      button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Update Geofence
+                  .panel.panel-default
+                        .panel-heading#with-tabs
+                            .navbar-text Settings
+                            ul.nav.nav-tabs
+                                li.active
+                                    a(href='#tab1sett', data-toggle='tab') Geofences
+                                li
+                                    a(href='#tab2sett', data-toggle='tab') Trips
+                                li
+                                    a(href='#tab3sett', data-toggle='tab') Alerts
+                        .panel-body
+                            .tab-content
+                                #tab1sett.tab-pane.fade.in.active
+                                    form(method="post", action='/elders/'+ item + '/updateGeofence')
+                                      br
+                                      h3.label Latitude*
+                                      input.form-control(type="number", name="latitude").required
+                                      br
+                                      h3.label Longitude*
+                                      input.form-control(type="number", name="longitude").required
+                                      br
+                                      h3.label Radius*
+                                      input.form-control(type="number", name="radius").required
+                                      br
+                                      button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Update Geofence
+                                #tab2sett.tab-pane.fade
+                                    h4 trips
+                                #tab3sett.tab-pane.fade
               .col-md-4.col-sm-6.col-xs-12
-                h2 Trips
-                h3 Current Trips
-                h3 Upcoming Trips
-                h3 Trip Requests
-
+                .panel.panel-default
+                    .panel-heading#with-tabs
+                        .navbar-text Trips
+                        ul.nav.nav-tabs
+                                li.active
+                                    a(href='#tab1trip', data-toggle='tab') Current
+                                li
+                                    a(href='#tab2trip', data-toggle='tab') Upcoming
+                                li
+                                    a(href='#tab3trip', data-toggle='tab') Requests
+                    .panel-body
+                        .tab-content
+                            #tab1trip.tab-pane.fade.in.active
+                                h4 Current Trips
+                            #tab2trip.tab-pane.fade
+                                h4 Upcoming Trips
+                            #tab3trip.tab-pane.fade
+                                h4 Trip Requests (from elder)
     br
     hr    
     .row
-        .col-md-4.col-sm-6.col-xs-12
+        .col-xs-6
             h2 Pending Elders
-        .col-md-4.col-sm-6.col-xs-12
+        .col-xs-6
             if(user.role=='caretaker')
             .panel.panel-default#addelderpanel
-            .panel-heading Add an Elder to your account:
-            .panel-body
-            h3= addError
-            form(method="post")
-                h3.label Elder Username*
-                input.form-control(type="text", name="username").required
-                h3.label Elder Phone Number*
-                input.form-control(type="text", name="phone").required
-                br
-                button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Elder
+                .panel-heading Add an Elder to your account:
+                .panel-body
+                    h3= addError
+                    form(method="post")
+                        h3.label Elder Username*
+                        input.form-control(type="text", name="username").required
+                        h3.label Elder Phone Number*
+                        input.form-control(type="text", name="phone").required
+                        br
+                        button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Elder
 
 
 
