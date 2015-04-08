@@ -206,3 +206,19 @@ a.navbar-tab {
 	margin-bottom:0px;
 	margin-top:7px;
 }
+
+/*MAPS*/
+#current_map{
+	height:300px;
+	width:100%;
+}
+
+#daily_map{
+	width:100%;
+	height:300px;
+}
+
+#weekly_map{
+	width:100%;
+	height:300px;
+}

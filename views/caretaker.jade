@@ -21,6 +21,7 @@ block content
       h2 Your Elders
       for item in elders
             h3= item
+            h4= item.geofence
           .row
               .col-md-4.col-sm-6.col-xs-12
                 .panel.with-nav-tabs.panel-default
@@ -36,9 +37,11 @@ block content
                     .panel-body
                         .tab-content
                             #tab1loc.tab-pane.fade.in.active
-                                iframe(width='405', height='300', frameborder='0', style='border:0', src='https://www.google.com/maps/embed/v1/place?key=AIzaSyD-UQS0FGNGKHaeJ-ZFayMwFCcs4xzVJOw\&q=Space+Needle,Seattle+WA')
+                                #current_map
                             #tab2loc.tab-pane.fade
+                                #daily_map
                             #tab3loc.tab-pane.fade
+                                #weekly_map
                         
               .col-md-4.col-sm-6.col-xs-12
                   .panel.panel-default
@@ -107,6 +110,3 @@ block content
                         br
                         button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Elder
 
-
-
-//refer to this for map use https://developers.google.com/maps/documentation/embed/guide#place_mode
