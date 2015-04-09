@@ -36,15 +36,12 @@ router.post('/confirm', function(req,res,next){
                                     var caretakerObjQuery = new parse.Query(Caretaker);
                                     caretakerObjQuery.get(caretakerId,{
                                         success: function(caretaker) {
-                                            console.log("here")
+                                            
                                             var caretaker_requests = elder.get("caretaker_requests");
                                             var elder_requests = caretaker.get("elder_requests");
-                                            console.log(caretaker_requests)
-                                            console.log(elder_requests)
+                                            
                                             caretaker_requests.splice(caretaker_requests.indexOf(elderUsername),1)
                                             elder_requests.splice(elder_requests.indexOf(caretakerUsername),1)
-                                            console.log(caretaker_requests)
-                                            console.log(elder_requests)
 
                                             elder.addUnique("caretakers",caretakerUsername);
                                             caretaker.addUnique("elders",elderUsername);
@@ -132,6 +129,32 @@ router.get('/:username', function(req,res,next){
         }
     })
 })
+
+router.post('/:username/update', function(req,res){
+    var username = req.params.username;
+    var latitude = req.body.latitude;
+    var longitude = req.body.longitude;
+
+    var elderIdQuery = new parse.Query(Elder);
+    elderIdQuery.equalTo("user.username",username);
+    elderIdQuery.find({
+        success: function(elders) {
+            if(elders.length > 0){
+                var elderId = elders[0].id;
+                var elderObjQuery = new parse.Query(Elder);
+                elderObjQuery.get(elderId,{
+                    success: function(elder){
+
+                        elder.addUnique("locations", new parse.GeoPoint({latitude: latitude, longitude: longitude}));
+                        elder.save();
+                        res.send(200);
+                        
+                    }
+                })
+            }
+        }
+    })
+});
 
 router.post('/:username/updateGeofence', function(req, res){
     var username = req.params.username;
