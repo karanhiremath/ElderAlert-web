@@ -4,9 +4,22 @@ html
 	title= title
 	link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.css", rel="stylesheet")
 	link(rel='stylesheet', href='/stylesheets/style.css')
+	link(type='text/css', rel='stylesheet', href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,800,300,700' )
+	
+	script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
+	
+	script(type='text/javascript', src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD-UQS0FGNGKHaeJ-ZFayMwFCcs4xzVJOw')
+	
+	script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js')
+	
+	script(type='text/javascript', src='/js/current-map.js')
+	script(type='text/javascript', src='/js/daily-map.js')
+	script(type='text/javascript', src='/js/weekly-map.js')
+
 	body
 		include header
 
 		block content
 
 		include footer
+

@@ -1,17 +1,18 @@
 div.navbar.navbar-inverse.navbar-fixed-top(role='navigation')
-	div.container
-		div.navbar-header
+	div.container#navcontaner
+		div.navbar-headeri
 			button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
 				span.icon-bar
 				span.icon-bar
 				span.icon-bar
 			a.navbar-brand(href="#")
-				| ElderAlert
+				img.logo(src="/images/logo_black65_2.png")
+			a.navbar-brand#headname(href="#") ElderAlert
 		div.collapse.navbar-collapse
 			ul.nav.navbar-nav
-				li.active
-					a(href="#") Home
-				li
-					a(href="#about") About
-				li
-					a(href="#contact") Contact
+				li.active.li-header
+					a.navbar-tab(href="#") Home
+				li.li-header
+					a.navbar-tab(href="#about") About
+				li.li-header
+					a.navbar-tab(href="#contact") Contact
