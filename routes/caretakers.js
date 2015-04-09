@@ -110,11 +110,13 @@ router.get('/:username', function(req,res,next){
                             user = caretaker.user;
                             console.log(user)
                             elders = caretaker.elders;
+                            var elder_requests = caretaker.elder_requests;
                             res.render('caretaker',
                             {
                                 user:user,
                                 caretaker:caretaker,
                                 elders:elders,
+                                elder_requests: elder_requests,
                                 topError:"",
                                 addError:""
                             });

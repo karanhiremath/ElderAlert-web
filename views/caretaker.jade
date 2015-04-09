@@ -96,6 +96,11 @@ block content
     .row
         .col-xs-6
             h2 Pending Elders
+            ul
+                if (elder_requests) 
+                for item in elder_requests
+                    li
+                        h3= item
         .col-xs-6
             if(user.role=='caretaker')
             .panel.panel-default#addelderpanel
