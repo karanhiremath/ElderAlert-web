@@ -151,7 +151,7 @@ router.post('/:username/update', function(req,res){
                     success: function(elder){
                         elder.addUnique("locations", new parse.GeoPoint({latitude: latitude, longitude: longitude}));
                         elder.save();
-                        checkAlerts(elder, latitude, longitude);
+                        formAlerts(elder, latitude, longitude);
                         res.sendStatus(200);
                         
                     }
@@ -161,21 +161,66 @@ router.post('/:username/update', function(req,res){
     });
 });
 
-var checkAlerts = function(elder, latitude, longitude) {
+var formAlerts = function(elder, latitude, longitude) {
+    var query = new parse.Query(Alert);
+    console.log(elder);
+    query.equalTo("elder", elder.get("user").username);
+    query.equalTo("dismissed", false);
+    var geofenceAlertPresent = false;
+    var noMotionAlertPresent = false;
+
+    query.find({
+        success: function(alerts) {
+            console.log("alerts:");
+            console.log(alerts);
+            for (var i = 0; i < alerts.length; i++) {
+                if(alerts[i].attributes.type === "geofence-trespassed") {
+                    geofenceAlertPresent = true;
+                }
+                if(alerts[i].attributes.type === "no-motion") {
+                    noMotionAlert = true;
+                }
+            }
+            console.log("after iterating through results:");
+            console.log(geofenceAlertPresent);
+            console.log(noMotionAlertPresent);
+
+            if(!geofenceAlertPresent) {
+                checkForGeofenceAlert(elder, latitude, longitude);
+            }
+
+            if(!noMotionAlertPresent) {
+                checkForNoMotionAlert(elder, latitude, longitude);
+            }
+        },
+        error: function(error) {
+            console.log("Error: " + error.code + " " + error.message);
+        }
+
+    });
+};
+
+
+var checkForNoMotionAlert = function(elder, latitude, longitude) {
+
+};
+
+
+var checkForGeofenceAlert = function(elder, latitude, longitude){
     var geofence = elder.get("geofence");
     geofence.fetch({
         success: function(geofence) {
             var currentLocation = new parse.GeoPoint({latitude: latitude, longitude: longitude});
             var distance = currentLocation.milesTo(geofence.get("location"));
-            console.log(distance);
+            console.log("distance" + distance);
             if(distance >= geofence.get("radius")) {
                 console.log("alert!");
-                var alert = Alert.spawn("Elder out of geofence", "Geofence", elder.get("user").username, elder.get("caretakers")[0]);
+                var alert = Alert.spawn("Elder out of geofence", "geofence-trespassed", elder.get("user").username, elder.get("caretakers")[0]);
                 alert.save();
-            }        
+            }
         }
     });
-}
+};
 
 
 router.post('/:username/updateGeofence', function(req, res){

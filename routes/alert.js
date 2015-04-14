@@ -4,8 +4,6 @@ var parse = require('parse').Parse;
 var Alert = parse.Object.extend("Alert", {
   // Instance methods
     initialize: function (attrs, options) {
-        this.seen = false;
-        this.dismissed = false;
   }
 }, {
   // Class methods
@@ -15,8 +13,15 @@ var Alert = parse.Object.extend("Alert", {
         alert.set("message", message);
         alert.set("type", type);
         alert.set("elder", elder_username);
+        alert.set("dismissed", false);
+        alert.set("seen", false);
         return alert;
     }
+
+//Types of alerts:
+// "geofence-trespassed"
+// "no-motion"
+
 });
 
 module.exports = Alert;
