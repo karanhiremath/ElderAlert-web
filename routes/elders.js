@@ -108,27 +108,29 @@ router.get('/:username', function(req,res,next){
                             var Elder = parse.Object.extend('Elder')
 
                             var elder = new Elder();
-                            elder.set("user",user)
-                            elder.set("caretaker_requests",[])
-                            elder.set("caretakers",[])
-                            elder.set("geofences",[])
-                            elder.set("locations",[])
+                            elder.set("user",user);
+                            elder.set("caretaker_requests",[]);
+                            elder.set("caretakers",[]);
+                            elder.set("geofences",[]);
+                            elder.set("locations",[]);
+                            elder.set("timeLastMoved", Date.now());
+                            elder.set("mostRecentLocation", null);
 
                             elder.save(null, {
                                 success: function(elder) {
-                                    elder = elder.attributes
+                                    elder = elder.attributes;
                                     user = elder.user
                                     res.render('elder',{
                                         user:user,
                                         elder:elder, error:""});
                                 }
-                            })    
+                            }); 
                         }
                     }
-                })
+                });
             }
         }
-    })
+    });
 });
 
 router.post('/:username/update', function(req,res){
@@ -149,11 +151,22 @@ router.post('/:username/update', function(req,res){
                 var elderObjQuery = new parse.Query(Elder);
                 elderObjQuery.get(elderId,{
                     success: function(elder){
-                        elder.addUnique("locations", new parse.GeoPoint({latitude: latitude, longitude: longitude}));
-                        elder.save();
-                        formAlerts(elder, latitude, longitude);
-                        res.sendStatus(200);
-                        
+                        var currentLocation = new parse.GeoPoint({latitude: latitude, longitude: longitude});
+                        if(checkLastLocation(elder, currentLocation)) {
+                            elder.set("timeLastMoved", Date.now());
+                            elder.set("mostRecentLocation", currentLocation);
+                        }
+                        elder.addUnique("locations", currentLocation);
+                        elder.save({
+                            success: function() {
+                                formAlerts(elder, currentLocation);
+                                res.sendStatus(200);
+                            },
+                            error: function() {
+                                res.sendStatus(500);
+                            }
+
+                        });
                     }
                 });
             }
@@ -161,7 +174,21 @@ router.post('/:username/update', function(req,res){
     });
 });
 
-var formAlerts = function(elder, latitude, longitude) {
+var checkLastLocation = function(elder, currentLocation) {
+    console.log(currentLocation);
+    console.log(elder.get("mostRecentLocation"));
+    if(elder.get("mostRecentLocation") === null){
+        return true;
+    } else {
+        var distance = currentLocation.milesTo(elder.get("mostRecentLocation"));
+        if (distance > .001){
+            return true;
+        }
+    }
+    return false;
+};
+
+var formAlerts = function(elder, currentLocation) {
     var query = new parse.Query(Alert);
     console.log(elder);
     query.equalTo("elder", elder.get("user").username);
@@ -178,7 +205,7 @@ var formAlerts = function(elder, latitude, longitude) {
                     geofenceAlertPresent = true;
                 }
                 if(alerts[i].attributes.type === "no-motion") {
-                    noMotionAlert = true;
+                    noMotionAlertPresent = true;
                 }
             }
             console.log("after iterating through results:");
@@ -186,11 +213,11 @@ var formAlerts = function(elder, latitude, longitude) {
             console.log(noMotionAlertPresent);
 
             if(!geofenceAlertPresent) {
-                checkForGeofenceAlert(elder, latitude, longitude);
+                checkForGeofenceAlert(elder, currentLocation);
             }
 
             if(!noMotionAlertPresent) {
-                checkForNoMotionAlert(elder, latitude, longitude);
+                checkForNoMotionAlert(elder);
             }
         },
         error: function(error) {
@@ -200,21 +227,24 @@ var formAlerts = function(elder, latitude, longitude) {
     });
 };
 
-
-var checkForNoMotionAlert = function(elder, latitude, longitude) {
-
+var checkForNoMotionAlert = function(elder) {
+    console.log(elder.get("timeLastMoved"));
+    console.log(Date.now());
+    if(Date.now() - elder.get("timeLastMoved") > 86,400,000) {
+        console.log("alert - no motion");
+        var alert = Alert.spawn("Elder has not moved in a day!", "no-motion", elder.get("user").username, elder.get("caretakers")[0]);
+        alert.save();
+    }
 };
 
-
-var checkForGeofenceAlert = function(elder, latitude, longitude){
+var checkForGeofenceAlert = function(elder, currentLocation){
     var geofence = elder.get("geofence");
     geofence.fetch({
         success: function(geofence) {
-            var currentLocation = new parse.GeoPoint({latitude: latitude, longitude: longitude});
             var distance = currentLocation.milesTo(geofence.get("location"));
             console.log("distance" + distance);
             if(distance >= geofence.get("radius")) {
-                console.log("alert!");
+                console.log("alert - Geofence!");
                 var alert = Alert.spawn("Elder out of geofence", "geofence-trespassed", elder.get("user").username, elder.get("caretakers")[0]);
                 alert.save();
             }
