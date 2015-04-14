@@ -5,6 +5,7 @@ var parse = require('parse').Parse;
 var Elder = parse.Object.extend('Elder')
 var Caretaker = parse.Object.extend('Caretaker')
 var Geofence = require('./geofence');
+var Alert = require('./alert');
 
 
 
@@ -128,12 +129,16 @@ router.get('/:username', function(req,res,next){
             }
         }
     })
-})
+});
 
 router.post('/:username/update', function(req,res){
     var username = req.params.username;
     var latitude = req.body.latitude;
     var longitude = req.body.longitude;
+
+    console.log(username);
+    console.log(latitude);
+    console.log(longitude);
 
     var elderIdQuery = new parse.Query(Elder);
     elderIdQuery.equalTo("user.username",username);
@@ -144,17 +149,34 @@ router.post('/:username/update', function(req,res){
                 var elderObjQuery = new parse.Query(Elder);
                 elderObjQuery.get(elderId,{
                     success: function(elder){
-
                         elder.addUnique("locations", new parse.GeoPoint({latitude: latitude, longitude: longitude}));
                         elder.save();
-                        res.send(200);
+                        checkAlerts(elder, latitude, longitude);
+                        res.sendStatus(200);
                         
                     }
-                })
+                });
             }
         }
-    })
+    });
 });
+
+var checkAlerts = function(elder, latitude, longitude) {
+    var geofence = elder.get("geofence");
+    geofence.fetch({
+        success: function(geofence) {
+            var currentLocation = new parse.GeoPoint({latitude: latitude, longitude: longitude});
+            var distance = currentLocation.milesTo(geofence.get("location"));
+            console.log(distance);
+            if(distance >= geofence.get("radius")) {
+                console.log("alert!");
+                var alert = Alert.spawn("Elder out of geofence", "Geofence", elder.get("user").username, elder.get("caretakers")[0]);
+                alert.save();
+            }        
+        }
+    });
+}
+
 
 router.post('/:username/updateGeofence', function(req, res){
     var username = req.params.username;

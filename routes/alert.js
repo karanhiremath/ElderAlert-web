@@ -6,17 +6,16 @@ var Alert = parse.Object.extend("Alert", {
     initialize: function (attrs, options) {
         this.seen = false;
         this.dismissed = false;
-        this.message = "";
   }
 }, {
   // Class methods
     spawn: function(message, type, elder_username, caretaker_username) {
-        this.recipient = caretaker_username;
-        this.message = message;
-        this.type = type;
-        this.elder = elder_username;
-        this.seen = false;
-        this.dismissed = false;
+        var alert = new Alert();
+        alert.set("recipient", caretaker_username);
+        alert.set("message", message);
+        alert.set("type", type);
+        alert.set("elder", elder_username);
+        return alert;
     }
 });
 
