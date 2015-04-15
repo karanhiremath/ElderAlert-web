@@ -7,90 +7,210 @@ block content
         .col-xs-6#alertpanel
             .panel.panel-blue
                 .panel-heading Ongoing Alerts
-                .panel-body
+                .panel-body#alertpanelbody
                     h4 Alert: Elder has left geofence @ time
                     h4 [Call 911] [Call Elder] [Dismiss]
         .col-xs-6#alertpanel
             .panel.panel-blue
                 .panel-heading Alert History
-                .panel-body
+                .panel-body#alertpanelbody
                     h4 Alert: Elder has left geofence @ time
                     h4 Alert: Elder has left geofence @ time
-    hr
+        
     if(elders)
       h2 Your Elders
+      //script(type='text/javascript', src='/js/current-map.js')
+      //script(type='text/javascript', src='/js/daily-map.js')
+      //script(type='text/javascript', src='/js/weekly-map.js')
       for item in elders
-            h3= item
-            h4= item.geofence
-          .row
-              .col-md-4.col-sm-6.col-xs-12
-                .panel.with-nav-tabs.panel-default
+        h3= item
+        script(type-'text/javascript').
+            var username = "#{item}";
+            var loadMap = function(){
+                $.get(username+'/getGeoData/', function(data){
+                    //geofence configuration
+                    var geofences = {};
+                    geofences['test'] = {
+                      center: new google.maps.LatLng(data.gfLat,data.gfLon),
+                      radius: data.gfRadius * 1000
+                    };
+                    //map options: centered @ current location
+                    var current_lat = data.locations[0].latitude;
+                    var current_lon = data.locations[0].longitude;
+                    var currentLocation = new google.maps.LatLng(current_lat,current_lon);
+                    var myOptions = {
+                        zoom: 9,
+                        center: currentLocation
+                    };
+                    //initialize 3 maps
+                    var current_map = new google.maps.Map(document.getElementById("current_map"),
+                        myOptions);
+                    var daily_map = new google.maps.Map(document.getElementById("daily_map"),
+                        myOptions);
+                    var weekly_map = new google.maps.Map(document.getElementById("weekly_map"),
+                        myOptions);
+                    //marker positioned at current (most recent) location
+                    var current_marker = new google.maps.Marker({
+                      position: currentLocation,
+                      map: current_map
+                    });
+                    var daily_marker = new google.maps.Marker({
+                      position: currentLocation,
+                      map: daily_map
+                    });
+                    var weekly_marker = new google.maps.Marker({
+                      position: currentLocation,
+                      map: weekly_map
+                    });
+                    //render geofences
+                    for ( var gf in geofences ){
+                      var geofenceOptions = {
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                        fillColor: '#FF0000',
+                        fillOpacity: 0.35,
+                        map: current_map,
+                        center: geofences[gf].center,
+                        radius: geofences[gf].radius
+                      };
+                      geofenceCircle = new google.maps.Circle(geofenceOptions);
+                    }
+                    for ( var gf in geofences ){
+                      var geofenceOptions = {
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                        fillColor: '#FF0000',
+                        fillOpacity: 0.35,
+                        map: daily_map,
+                        center: geofences[gf].center,
+                        radius: geofences[gf].radius
+                      };
+                      geofenceCircle = new google.maps.Circle(geofenceOptions);
+                    }
+                    for ( var gf in geofences ){
+                      var geofenceOptions = {
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                        fillColor: '#FF0000',
+                        fillOpacity: 0.35,
+                        map: weekly_map,
+                        center: geofences[gf].center,
+                        radius: geofences[gf].radius
+                      };
+                      geofenceCircle = new google.maps.Circle(geofenceOptions);
+                    }
+                    //daily/weekly location path
+                    var dailyPathPoints = [];
+                    var weeklyPathPoints = [];
+                    for (var i = 0; i < data.locations.length; i++){
+                        var latitude = data.locations[i].latitude;
+                        var longitude = data.locations[i].longitude;
+                        var point = new google.maps.LatLng(latitude, longitude);
+                        //if timestamp within week, add to week array
+                        dailyPathPoints.push(point);
+                        //if timestamp within day, add to daily array
+                        weeklyPathPoints.push(point);
+                    }
+                    var dailyPath = new google.maps.Polyline({
+                      path: dailyPathPoints,
+                      geodesic: true,
+                      strokeColor: '#009ED9',
+                      strokeOpacity: 1.0,
+                      strokeWeight: 2
+                    });
+                    dailyPath.setMap(daily_map);
+                    var weeklyPath = new google.maps.Polyline({
+                      path: dailyPathPoints,
+                      geodesic: true,
+                      strokeColor: '#009ED9',
+                      strokeOpacity: 1.0,
+                      strokeWeight: 2
+                    });
+                    weeklyPath.setMap(weekly_map);
+                    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                        google.maps.event.trigger(current_map, 'resize');
+                        google.maps.event.trigger(daily_map, 'resize');
+                        google.maps.event.trigger(weekly_map, 'resize');
+                        current_map.setCenter(currentLocation);
+                        daily_map.setCenter(currentLocation);
+                        weekly_map.setCenter(currentLocation);
+                    });
+                }); //$.get()
+            };
+            window.onload = loadMap;
+
+        .row
+          .col-md-4.col-sm-6.col-xs-12
+            .panel.with-nav-tabs.panel-default
+                .panel-heading#with-tabs
+                    .navbar-text Location
+                    ul.nav.nav-tabs
+                        li.active
+                            a(href='#tab1loc', data-toggle='tab') Current
+                        li
+                            a(href='#tab2loc', data-toggle='tab') Daily
+                        li
+                            a(href='#tab3loc', data-toggle='tab') Weekly
+                .panel-body
+                    .tab-content
+                        #tab1loc.tab-pane.fade.in.active
+                            #current_map
+                        #tab2loc.tab-pane.fade
+                            #daily_map
+                        #tab3loc.tab-pane.fade
+                            #weekly_map
+                    
+          .col-md-4.col-sm-6.col-xs-12
+              .panel.panel-default
                     .panel-heading#with-tabs
-                        .navbar-text Location
+                        .navbar-text Settings
                         ul.nav.nav-tabs
                             li.active
-                                a(href='#tab1loc', data-toggle='tab') Current
+                                a(href='#tab1sett', data-toggle='tab') Geofences
                             li
-                                a(href='#tab2loc', data-toggle='tab') Daily
+                                a(href='#tab2sett', data-toggle='tab') Trips
                             li
-                                a(href='#tab3loc', data-toggle='tab') Weekly
+                                a(href='#tab3sett', data-toggle='tab') Alerts
                     .panel-body
                         .tab-content
-                            #tab1loc.tab-pane.fade.in.active
-                                #current_map
-                            #tab2loc.tab-pane.fade
-                                #daily_map
-                            #tab3loc.tab-pane.fade
-                                #weekly_map
-                        
-              .col-md-4.col-sm-6.col-xs-12
-                  .panel.panel-default
-                        .panel-heading#with-tabs
-                            .navbar-text Settings
-                            ul.nav.nav-tabs
-                                li.active
-                                    a(href='#tab1sett', data-toggle='tab') Geofences
-                                li
-                                    a(href='#tab2sett', data-toggle='tab') Trips
-                                li
-                                    a(href='#tab3sett', data-toggle='tab') Alerts
-                        .panel-body
-                            .tab-content
-                                #tab1sett.tab-pane.fade.in.active
-                                    form(method="post", action='/elders/'+ item + '/updateGeofence')
-                                      br
-                                      h3.label Latitude*
-                                      input.form-control(type="number", name="latitude").required
-                                      br
-                                      h3.label Longitude*
-                                      input.form-control(type="number", name="longitude").required
-                                      br
-                                      h3.label Radius*
-                                      input.form-control(type="number", name="radius").required
-                                      br
-                                      button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Update Geofence
-                                #tab2sett.tab-pane.fade
-                                    h4 trips
-                                #tab3sett.tab-pane.fade
-              .col-md-4.col-sm-6.col-xs-12
-                .panel.panel-default
-                    .panel-heading#with-tabs
-                        .navbar-text Trips
-                        ul.nav.nav-tabs
-                                li.active
-                                    a(href='#tab1trip', data-toggle='tab') Current
-                                li
-                                    a(href='#tab2trip', data-toggle='tab') Upcoming
-                                li
-                                    a(href='#tab3trip', data-toggle='tab') Requests
-                    .panel-body
-                        .tab-content
-                            #tab1trip.tab-pane.fade.in.active
-                                h4 Current Trips
-                            #tab2trip.tab-pane.fade
-                                h4 Upcoming Trips
-                            #tab3trip.tab-pane.fade
-                                h4 Trip Requests (from elder)
+                            #tab1sett.tab-pane.fade.in.active
+                                form(method="post", action='/elders/'+ item + '/updateGeofence')
+                                  br
+                                  h3.label Latitude*
+                                  input.form-control(type="number", name="latitude").required
+                                  br
+                                  h3.label Longitude*
+                                  input.form-control(type="number", name="longitude").required
+                                  br
+                                  h3.label Radius*
+                                  input.form-control(type="number", name="radius").required
+                                  br
+                                  button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Update Geofence
+                            #tab2sett.tab-pane.fade
+                                h4 trips
+                            #tab3sett.tab-pane.fade
+          .col-md-4.col-sm-6.col-xs-12
+            .panel.panel-default
+                .panel-heading#with-tabs
+                    .navbar-text Trips
+                    ul.nav.nav-tabs
+                            li.active
+                                a(href='#tab1trip', data-toggle='tab') Current
+                            li
+                                a(href='#tab2trip', data-toggle='tab') Upcoming
+                            li
+                                a(href='#tab3trip', data-toggle='tab') Requests
+                .panel-body
+                    .tab-content
+                        #tab1trip.tab-pane.fade.in.active
+                            h4 Current Trips
+                        #tab2trip.tab-pane.fade
+                            h4 Upcoming Trips
+                        #tab3trip.tab-pane.fade
+                            h4 Trip Requests (from elder)
     br
     hr    
     .row

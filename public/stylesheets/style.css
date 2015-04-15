@@ -130,6 +130,11 @@ label.checkbox{
 	border-bottom:none;
 }
 
+#alertpanelbody{
+	height:100px;
+	overflow-y: scroll;
+}
+
 .panel-body{
 	padding:5px;
 }
