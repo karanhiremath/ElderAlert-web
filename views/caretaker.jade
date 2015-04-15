@@ -43,64 +43,35 @@ block content
                         center: currentLocation
                     };
                     //initialize 3 maps
+                    var maps = [];
                     var current_map = new google.maps.Map(document.getElementById("current_map"),
                         myOptions);
+                    maps.push(current_map);
                     var daily_map = new google.maps.Map(document.getElementById("daily_map"),
                         myOptions);
+                    maps.push(daily_map);
                     var weekly_map = new google.maps.Map(document.getElementById("weekly_map"),
                         myOptions);
-                    //marker positioned at current (most recent) location
-                    var current_marker = new google.maps.Marker({
-                      position: currentLocation,
-                      map: current_map
-                    });
-                    var daily_marker = new google.maps.Marker({
-                      position: currentLocation,
-                      map: daily_map
-                    });
-                    var weekly_marker = new google.maps.Marker({
-                      position: currentLocation,
-                      map: weekly_map
-                    });
-                    //render geofences
-                    for ( var gf in geofences ){
-                      var geofenceOptions = {
-                        strokeColor: '#FF0000',
-                        strokeOpacity: 0.8,
-                        strokeWeight: 2,
-                        fillColor: '#FF0000',
-                        fillOpacity: 0.35,
-                        map: current_map,
-                        center: geofences[gf].center,
-                        radius: geofences[gf].radius
-                      };
-                      geofenceCircle = new google.maps.Circle(geofenceOptions);
-                    }
-                    for ( var gf in geofences ){
-                      var geofenceOptions = {
-                        strokeColor: '#FF0000',
-                        strokeOpacity: 0.8,
-                        strokeWeight: 2,
-                        fillColor: '#FF0000',
-                        fillOpacity: 0.35,
-                        map: daily_map,
-                        center: geofences[gf].center,
-                        radius: geofences[gf].radius
-                      };
-                      geofenceCircle = new google.maps.Circle(geofenceOptions);
-                    }
-                    for ( var gf in geofences ){
-                      var geofenceOptions = {
-                        strokeColor: '#FF0000',
-                        strokeOpacity: 0.8,
-                        strokeWeight: 2,
-                        fillColor: '#FF0000',
-                        fillOpacity: 0.35,
-                        map: weekly_map,
-                        center: geofences[gf].center,
-                        radius: geofences[gf].radius
-                      };
-                      geofenceCircle = new google.maps.Circle(geofenceOptions);
+                    maps.push(weekly_map);
+                    //set current location marker
+                    for (var m = 0; m < maps.length; m++ ){
+                        var location_marker = new google.maps.Marker({
+                            position: currentLocation,
+                            map: maps[m]
+                        });
+                        for ( var gf in geofences ){
+                          var geofenceOptions = {
+                            strokeColor: '#FF0000',
+                            strokeOpacity: 0.8,
+                            strokeWeight: 2,
+                            fillColor: '#FF0000',
+                            fillOpacity: 0.35,
+                            map: maps[m],
+                            center: geofences[gf].center,
+                            radius: geofences[gf].radius
+                          };
+                          geofenceCircle = new google.maps.Circle(geofenceOptions);
+                        }
                     }
                     //daily/weekly location path
                     var dailyPathPoints = [];
