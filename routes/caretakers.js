@@ -224,12 +224,14 @@ router.get('/:username/getGeoData', function(req, res, next){
                         var gfLat = geofence.get("location").latitude;
                         var gfLon = geofence.get("location").longitude;
                         var gfRadius = geofenceAtt.radius;
+                        var mostRecentLoc = foundElder.mostRecentLocation;
                         var locations = foundElder.locations;
                         var geoData = {
                             gfLat: gfLat,
                             gfLon: gfLon,
                             gfRadius: gfRadius,
-                            locations: locations
+                            locations: locations,
+                            mostRecentLocation: mostRecentLoc
                         };
                         res.send(geoData);
                     },
