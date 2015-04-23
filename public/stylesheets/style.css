@@ -82,6 +82,16 @@ label.checkbox{
 	margin-top:9px;
 }
 
+#nobullet{
+	list-style-type: none;
+}
+
+label.control-label{
+	font-weight:none;
+	font-size:16px;
+	margin-right: 175px;
+}
+
 /*Panels */
 #addelderpanel{
 	width:375px;
