@@ -32,8 +32,8 @@ block content
                       radius: data.gfRadius * 1000
                     };
                     //map options: centered @ current location
-                    var current_lat = data.locations[0].latitude;
-                    var current_lon = data.locations[0].longitude;
+                    var current_lat = data.mostRecentLocation.latitude;
+                    var current_lon = data.mostRecentLocation.longitude;
                     var currentLocation = new google.maps.LatLng(current_lat,current_lon);
                     var myOptions = {
                         zoom: 9,
@@ -180,24 +180,24 @@ block content
                             #tab3sett.tab-pane.fade
                                 form.form-horizontal(method='post', action = '')
                                     h4#alertType Geofence Alerts
-                                    .row
+                                    .row#alertRow
                                         .col-md-6
                                             h4(align='center') Email Notifications
                                         .col-md-6
                                             input(type='checkbox', name='my-checkbox', checked='')
-                                    .row
+                                    .row#alertRow
                                         .col-md-6
                                             h4(align='center') SMS Notifications
                                         .col-md-6.col-centered
                                             input(type='checkbox', name='my-checkbox', checked='')
                                     hr
                                     h4#alertType No Motion Alerts
-                                    .row
+                                    .row#alertRow
                                         .col-md-6
                                             h4(align='center') Email Notifications
                                         .col-md-6.col-centered
                                             input(type='checkbox', name='my-checkbox', checked='')
-                                    .row
+                                    .row#alertRow
                                         .col-md-6
                                             h4(align='center') SMS Notifications
                                         .col-md-6(margin-left='50px')
