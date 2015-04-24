@@ -237,3 +237,13 @@ a.navbar-tab {
 	width:100%;
 	height:300px;
 }
+
+/*Alert Settings Panel*/
+.bootstrap-switch{
+	margin-left:25%;
+}
+
+#alertType{
+	margin-left:10px;
+}
+

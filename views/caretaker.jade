@@ -19,9 +19,6 @@ block content
         
     if(elders)
       h2 Your Elders
-      //script(type='text/javascript', src='/js/current-map.js')
-      //script(type='text/javascript', src='/js/daily-map.js')
-      //script(type='text/javascript', src='/js/weekly-map.js')
       for item in elders
         h3= item
         script(type-'text/javascript').
@@ -112,6 +109,7 @@ block content
                 }); //$.get()
             };
             window.onload = loadMap;
+
         .row
           .col-md-4.col-sm-6.col-xs-12
             .panel.with-nav-tabs.panel-default
@@ -132,7 +130,6 @@ block content
                             #daily_map
                         #tab3loc.tab-pane.fade
                             #weekly_map
-                    
           .col-md-4.col-sm-6.col-xs-12
               .panel.panel-default
                     .panel-heading#with-tabs
@@ -166,57 +163,62 @@ block content
                                     h3.label Trip Name*
                                     input.form-control(type="text", name="tripName", placeholder="Write a description for your trip...").required
                                     br
-                                    h3.label Start Time*
-                                    #datetimepicker1.input-group.date 
-                                        input.form-control(type="text")
-                                        span.input-group-addon
-                                            span.glyphicon.glyphicon-calendar
-                                    br
-                                    h3.label End Time*
-                                    #datetimepicker2.input-group.date 
-                                        input.form-control(type="text")
-                                        span.input-group-addon
-                                            span.glyphicon.glyphicon-calendar
-                                    br
+                                    .form-group
+                                        h3.label Start Time*
+                                        #datetimepickerStart.input-group.date 
+                                            input.form-control(type="text")
+                                            span.input-group-addon
+                                                span.glyphicon.glyphicon-calendar
+                                        br
+                                        h3.label End Time*
+                                        #datetimepickerEnd.input-group.date 
+                                            input.form-control(type="text")
+                                            span.input-group-addon
+                                                span.glyphicon.glyphicon-calendar
+                                        br
                                     button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Trip
                             #tab3sett.tab-pane.fade
                                 form.form-horizontal(method='post', action = '')
-                                    h4 Geofence Alerts
-                                    ul#nobullet
-                                        li
-                                            .form-group
-                                                label.control-label Email Notification
-                                                input(type='checkbox', name='my-checkbox', checked='')
-
-                                        li
-                                            .form-group
-                                                label.control-label SMS  Notifications 
-                                                input(type='checkbox', name='my-checkbox', checked='')
+                                    h4#alertType Geofence Alerts
+                                    .row
+                                        .col-md-6
+                                            h4(align='center') Email Notifications
+                                        .col-md-6
+                                            input(type='checkbox', name='my-checkbox', checked='')
+                                    .row
+                                        .col-md-6
+                                            h4(align='center') SMS Notifications
+                                        .col-md-6.col-centered
+                                            input(type='checkbox', name='my-checkbox', checked='')
                                     hr
-                                    h4 No Motion Alerts
-                                    ul#nobullet
-                                        li
-                                            .form-group
-                                                label.control-label Email Notification
-                                                input(type='checkbox', name='my-checkbox', checked='')
-
-                                        li
-                                            .form-group
-                                                label.control-label SMS  Notifications 
-                                                input(type='checkbox', name='my-checkbox', checked='')
+                                    h4#alertType No Motion Alerts
+                                    .row
+                                        .col-md-6
+                                            h4(align='center') Email Notifications
+                                        .col-md-6.col-centered
+                                            input(type='checkbox', name='my-checkbox', checked='')
+                                    .row
+                                        .col-md-6
+                                            h4(align='center') SMS Notifications
+                                        .col-md-6(margin-left='50px')
+                                            input(type='checkbox', name='my-checkbox', checked='', align='center')
+                            link(href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.css', rel='stylesheet')
+                            script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.js')
                             script(type='text/javascript').
                                 $(function () {
-                                    $("[name='my-checkbox']").bootstrapSwitch();
-                                    $('#datetimepicker1').datetimepicker();
-                                    $('#datetimepicker2').datetimepicker();
-                                    $("#datetimepicker1").on("dp.change", function (e) {
-                                        $('#datetimepicker2').data("DateTimePicker").minDate(e.date);
+                                    $("[name='my-checkbox']").bootstrapSwitch({
+                                        onColor:'success',
+                                        size:'small'
+                                        });
+                                    $('#datetimepickerStart').datetimepicker();
+                                    $('#datetimepickerEnd').datetimepicker();
+                                    $("#datetimepickerStart").on("dp.change", function (e) {
+                                    $('#datetimepickerEnd').data("DateTimePicker").minDate(e.date);
                                     });
-                                    $("#datetimepicker2").on("dp.change", function (e) {
-                                        $('#datetimepicker1').data("DateTimePicker").maxDate(e.date);
+                                    $("#datetimepickerEnd").on("dp.change", function (e) {
+                                    $('#datetimepickerStart').data("DateTimePicker").maxDate(e.date);
                                     });
                                 });
-
           .col-md-4.col-sm-6.col-xs-12
             .panel.panel-default
                 .panel-heading#with-tabs
@@ -259,3 +261,6 @@ block content
                         input.form-control(type="text", name="phone").required
                         br
                         button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Elder
+
+
+
