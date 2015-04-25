@@ -26,6 +26,7 @@ block content
             var loadMap = function(){
                 $.get(username+'/getGeoData/', function(data){
                     //geofence configuration
+                    console.log(data.gfRadius)
                     var geofences = {};
                     geofences['test'] = {
                       center: new google.maps.LatLng(data.gfLat,data.gfLon),
@@ -202,7 +203,7 @@ block content
                                             h4(align='center') SMS Notifications
                                         .col-md-6(margin-left='50px')
                                             input(type='checkbox', name='my-checkbox', checked='', align='center')
-                            link(href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.css', rel='stylesheet')
+                            link(type='text/css', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.css', rel='stylesheet')
                             script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.js')
                             script(type='text/javascript').
                                 $(function () {
@@ -241,16 +242,20 @@ block content
     br
     hr    
     .row
-        .col-xs-6
-            h2 Pending Elders
-            ul
-                if (elder_requests) 
-                for item in elder_requests
-                    li
-                        h3= item
-        .col-xs-6
+        .col-md-3
+            .panel.panel-default
+                .panel-heading Pending Elders
+                .panel-body
+                    ul
+                        if (elder_requests) 
+                        for item in elder_requests
+                            li
+                                h4= item
+                        else
+                            h4 You do not have any pending elder confirmations at this time
+        .col-md-3
             if(user.role=='caretaker')
-            .panel.panel-default#addelderpanel
+            .panel.panel-default
                 .panel-heading Add an Elder to your account:
                 .panel-body
                     h3= addError
@@ -261,6 +266,27 @@ block content
                         input.form-control(type="text", name="phone").required
                         br
                         button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Elder
+        .col-md-3
+            .panel.panel-default
+                .panel-heading Current Elders
+                .panel-body
+                    ul
+                        if (elders)
+                        for item in elders
+                            li
+                                h4=item
+        .col-md-3
+            if(user.role=='caretaker')
+            .panel.panel-default
+                .panel-heading Remove an Elder from your account:
+                .panel-body
+                    h4= addError
+                    form(method="post",  action=user.username + '/removeElder')
+                        h3.label Elder Username*
+                        input.form-control(type="text", name="elderUsername").required
+                        br
+                        button.btn.btn-lg.btn-primary.btn-block.btn-red(type='submit') Remove Elder
+
 
 
 

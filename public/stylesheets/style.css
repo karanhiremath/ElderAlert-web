@@ -93,9 +93,6 @@ label.control-label{
 }
 
 /*Panels */
-#addelderpanel{
-	width:375px;
-}
 
 #alertpanel{
 	padding-right:5px;
@@ -154,6 +151,20 @@ label.control-label{
   margin: 5px;
 }
 
+.btn-red{
+	margin-left:0px;
+	margin-right:0px;
+	background:#e22b03;
+	color:#ffffff;
+	border: solid #a02d05 1px;
+}
+
+.btn-red:hover{
+	background:#af2d05;
+	color:#ffffff;
+	text-decoration:none;
+}
+
 .btn-green{
 	background:#16eeb6;
 	color:#ffffff;
@@ -163,7 +174,7 @@ label.control-label{
 .btn-green:hover{
 	background:#0CDDAD;
 	color:#ffffff;
-	text-deciration:none;
+	text-decoration:none;
 }
 
 .btn-blue{
@@ -177,7 +188,7 @@ label.control-label{
 .btn-blue:hover{
 	background:#0086C4;
 	color:#ffffff;
-	text-deciration:none;
+	text-decoration:none;
 }
 
 /*Navbar*/
