@@ -122,18 +122,19 @@ block content
                     .navbar-text Location
                     ul.nav.nav-tabs
                         li.active
-                            a(href='#tab1loc', data-toggle='tab') Current
+                            a(href='#tabCurrentMap_'+item, data-toggle='tab') Current
                         li
-                            a(href='#tab2loc', data-toggle='tab') Daily
+                            a(href='#tabDailyMap_'+item, data-toggle='tab') Daily
                         li
-                            a(href='#tab3loc', data-toggle='tab') Weekly
+                            a(href='#tabWeeklyMap_'+item, data-toggle='tab') Weekly
                 .panel-body
                     .tab-content
-                        #tab1loc.tab-pane.fade.in.active
+                        //#tab1loc.tab-pane.fade.in.active
+                        div(id='tabCurrentMap_'+item, class='tab-pane fade active in')
                             div(id='current_map_'+item, class='map')
-                        #tab2loc.tab-pane.fade
+                        div(id='tabDailyMap_'+item, class='tab-pane fade')
                             div(id='daily_map_'+item, class='map')
-                        #tab3loc.tab-pane.fade
+                        div(id='tabWeeklyMap_'+item, class='tab-pane fade')
                             div(id='weekly_map_'+item, class='map')
           .col-md-4.col-sm-6.col-xs-12
               .panel.panel-default
@@ -141,14 +142,14 @@ block content
                         .navbar-text Settings
                         ul.nav.nav-tabs
                             li.active
-                                a(href='#tab1sett', data-toggle='tab') Geofences
+                                a(href='#tabSetGeofence_'+item, data-toggle='tab') Geofences
                             li
-                                a(href='#tab2sett', data-toggle='tab') Trips
+                                a(href='#tabSetTrips_'+item, data-toggle='tab') Trips
                             li
-                                a(href='#tab3sett', data-toggle='tab') Alerts
+                                a(href='#tabSetAlerts_'+item, data-toggle='tab') Alerts
                     .panel-body
                         .tab-content
-                            #tab1sett.tab-pane.fade.in.active
+                            div(id = 'tabSetGeofence_'+item, class='tab-pane fade in active')
                                 form(method="post", action='/elders/'+ item + '/updateGeofence')
                                   br
                                   h3.label Latitude*
@@ -161,7 +162,7 @@ block content
                                   input.form-control(type="number", name="radius").required
                                   br
                                   button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Update Geofence
-                            #tab2sett.tab-pane.fade
+                            div(id='tabSetTrips_'+item, class='tab-pane fade')
                                 form(method="post", action='/elders/'+ item + '/addTrip') 
                                     br
                                     h3.label Trip Name*
@@ -181,7 +182,7 @@ block content
                                                 span.glyphicon.glyphicon-calendar
                                         br
                                     button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Trip
-                            #tab3sett.tab-pane.fade
+                            div(id='tabSetAlerts_'+item, class='tab-pane fade')
                                 form.form-horizontal(method='post', action ='')
                                     h4#alertType Geofence Alerts
                                     .row#alertRow
@@ -229,18 +230,19 @@ block content
                     .navbar-text Trips
                     ul.nav.nav-tabs
                             li.active
-                                a(href='#tab1trip', data-toggle='tab') Current
+                                a(href='#tabTripCurrent_'+item, data-toggle='tab') Current
                             li
-                                a(href='#tab2trip', data-toggle='tab') Upcoming
+                                a(href='#tabTripUpcoming_'+item, data-toggle='tab') Upcoming
                             li
-                                a(href='#tab3trip', data-toggle='tab') Requests
+                                a(href='#tabTripRequests_'+item, data-toggle='tab') Requests
                 .panel-body
                     .tab-content
-                        #tab1trip.tab-pane.fade.in.active
+                        div(id ='tabTripCurrent_'+item, class='tab-pane fade in active')
                             h4 Current Trips
+                        div(id ='tabTripUpcoming_'+item, class='tab-pane fade')
                         #tab2trip.tab-pane.fade
                             h4 Upcoming Trips
-                        #tab3trip.tab-pane.fade
+                        div(id ='tabTripRequests_'+item, class='tab-pane fade')
                             h4 Trip Requests (from elder)
     br
     hr    
