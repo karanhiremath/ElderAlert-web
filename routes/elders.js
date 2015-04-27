@@ -282,4 +282,5 @@ router.post('/:username/updateGeofence', function(req, res){
     });
 });
 
+
 module.exports = router;

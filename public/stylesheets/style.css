@@ -234,6 +234,11 @@ a.navbar-tab {
 }
 
 /*MAPS*/
+.map{
+	height:300px;
+	width:100%;
+}
+
 #current_map{
 	height:300px;
 	width:100%;
