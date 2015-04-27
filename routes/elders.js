@@ -6,6 +6,7 @@ var Elder = parse.Object.extend('Elder')
 var Caretaker = parse.Object.extend('Caretaker')
 var Geofence = require('./geofence');
 var Alert = require('./alert');
+var Trip = require('./trip');
 
 
 
@@ -255,7 +256,6 @@ var checkForGeofenceAlert = function(elder, currentLocation){
 
 router.post('/:username/updateGeofence', function(req, res){
     var username = req.params.username;
-    console.log(username);
     var elderIdQuery = new parse.Query(Elder);
     elderIdQuery.equalTo("user.username",username);
     elderIdQuery.find({
@@ -269,6 +269,39 @@ router.post('/:username/updateGeofence', function(req, res){
                         elder.set("geofence", geofence);
                         elder.save();
                         res.send(200);
+                    },
+                      error: function(user, error) {
+                        console.log(error);
+                        res.send(500);
+                        // The object was not retrieved successfully.
+                        // error is a Parse.Error with an error code and message.
+                    }
+                });
+            }
+        }
+    });
+});
+
+router.post('/:username/addTrip', function(req, res){
+    var username = req.params.username;
+    var tripName = req.body.tripName;
+    var startDateStr = req.body.startDate;
+    var endDateStr = req.body.endDate;
+    var startDate = new Date(startDateStr);
+    var endDate = new Date(endDateStr);
+    console.log(username);
+    var elderIdQuery = new parse.Query(Elder);
+    elderIdQuery.equalTo("user.username",username);
+    elderIdQuery.find({
+        success: function(elders) {
+            if(elders.length > 0){
+                var elderId = elders[0].id;
+                var elderObjQuery = new parse.Query(Elder);
+                elderObjQuery.get(elderId,{
+                    success: function(elder) {
+                        var trip = Trip.spawn(elder.get("user").username, tripName, true, startDate, endDate);
+                        trip.save();
+                        res.status(200).redirect('back');
                     },
                       error: function(user, error) {
                         console.log(error);

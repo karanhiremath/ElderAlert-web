@@ -162,28 +162,27 @@ block content
                                   br
                                   button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Update Geofence
                             #tab2sett.tab-pane.fade
-                                form(method="post", action="") 
-                                    //TODO: make Trip object
+                                form(method="post", action='/elders/'+ item + '/addTrip') 
                                     br
                                     h3.label Trip Name*
-                                    input.form-control(type="text", name="tripName", placeholder="Write a description for your trip...").required
+                                    input.form-control(type="text", name="tripName", placeholder="Write a description or name for the trip...").required
                                     br
                                     .form-group
                                         h3.label Start Time*
                                         #datetimepickerStart.input-group.date 
-                                            input.form-control(type="text")
+                                            input.form-control(type="text", name="startDate").required
                                             span.input-group-addon
                                                 span.glyphicon.glyphicon-calendar
                                         br
                                         h3.label End Time*
                                         #datetimepickerEnd.input-group.date 
-                                            input.form-control(type="text")
+                                            input.form-control(type="text", name="endDate").required
                                             span.input-group-addon
                                                 span.glyphicon.glyphicon-calendar
                                         br
                                     button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Trip
                             #tab3sett.tab-pane.fade
-                                form.form-horizontal(method='post', action = '')
+                                form.form-horizontal(method='post', action ='')
                                     h4#alertType Geofence Alerts
                                     .row#alertRow
                                         .col-md-6
