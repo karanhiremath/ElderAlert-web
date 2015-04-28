@@ -75,7 +75,7 @@ router.post('/:username', function(req, res, next){
 
 
 router.get('/:username', function(req,res,next){
-
+    console.log("got to elders.js");
     var username = req.params.username
     var query = new parse.Query(parse.User);
     query.equalTo("username",username);
@@ -114,15 +114,19 @@ router.get('/:username', function(req,res,next){
                             elder.set("geofences",[]);
                             elder.set("locations",[]);
                             elder.set("timeLastMoved", Date.now());
-                            elder.set("mostRecentLocation", null);
+                            elder.set("mostRecentLocation", new parse.GeoPoint({latitude:0, longitude:0}));
 
                             elder.save(null, {
                                 success: function(elder) {
+                                    console.log("elder saved successfully");
                                     elder = elder.attributes;
                                     user = elder.user
                                     res.render('elder',{
                                         user:user,
                                         elder:elder, error:""});
+                                }, 
+                                error: function(error) {
+                                    console.log(error);
                                 }
                             }); 
                         }

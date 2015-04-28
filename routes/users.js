@@ -30,6 +30,7 @@ router.post('/signup', function(req, res, next) {
         if (user.attributes.role == 'caretaker') {
             res.redirect("/caretakers/"+user.attributes.username);    
         }else if(user.attributes.role == 'elder') {
+            console.log("user signed up");
             res.redirect("/elders/"+user.attributes.username);    
         }
         
