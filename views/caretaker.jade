@@ -107,9 +107,125 @@ block content
                         });
                     }); // end of $.get()
                 }; // end of loadMap
+                function formatTripEntry(trip){
+                    var tripEntry = document.createElement('li');
+                    tripEntry.setAttribute("class","list-group-item");
+                        //create trip name row
+                        var tripNameRow = document.createElement('div');
+                        tripNameRow.setAttribute("class", "row trip-row");
+                            //create name header
+                            var tripNameHeading = document.createElement('h4');
+                            tripNameHeading.setAttribute("class", "boldText");
+                                //create and append calendar icon
+                                var calendarIcon = document.createElement('span');
+                                calendarIcon.setAttribute("class", "glyphicon glyphicon-calendar glyph-padd");
+                                tripNameHeading.appendChild(calendarIcon);
+                                //create and append text
+                                var tripName = document.createTextNode(trip.tripName);
+                                tripNameHeading.appendChild(tripName);
+                        //append heading to row
+                        tripNameRow.appendChild(tripNameHeading);
+                        //append row to list-item
+                    tripEntry.appendChild(tripNameRow);
+                        //create trip start time row
+                        var tripTimeLeftRow = document.createElement('div');
+                        tripTimeLeftRow.setAttribute("class", "row trip-row");
+                            //create time header
+                            var tripTimeLeftHeading = document.createElement('h4');
+                            //create and append calendar icon
+                                var hourglassIcon = document.createElement('span');
+                                hourglassIcon.setAttribute("class", "glyphicon glyphicon-hourglass glyph-padd");
+                                tripTimeLeftHeading.appendChild(hourglassIcon);
+                                //create and append text
+                                var start = new Date(trip.startDate.iso);
+                                var end = new Date(trip.endDate.iso);
+                                var secondsLeft = (end-start) /1000;
+                                var days = parseInt(secondsLeft/86400);
+                                secondsLeft= secondsLeft % 86400;
+                                var hours = parseInt(secondsLeft/3600);
+                                secondsLeft = secondsLeft % 3600;
+                                var minutes = parseInt(secondsLeft/60);
+                                var seconds = parseInt(secondsLeft % 60);
+                                var tripTimeLeft = document.createTextNode("Duration: " + days +" days, "+hours+" hours, "+minutes+ "min, "+ seconds+ "sec");
+                                tripTimeLeftHeading.appendChild(tripTimeLeft);
+                        tripTimeLeftRow.appendChild(tripTimeLeftHeading);
+                    tripEntry.appendChild(tripTimeLeftRow);
+                        //create trip start time row
+                        var tripStartTimeRow = document.createElement('div');
+                        tripStartTimeRow.setAttribute("class", "row trip-row");
+                            //create time header
+                            var tripStartTimeHeading = document.createElement('h4');
+                            //create and append calendar icon
+                                var timeIcon = document.createElement('span');
+                                timeIcon.setAttribute("class", "glyphicon glyphicon-time glyph-padd");
+                                tripStartTimeHeading.appendChild(timeIcon);
+                                //create and append text
+                                var startDate = new Date(trip.startDate.iso).toDateString();
+                                var startTime = new Date(trip.startDate.iso).toLocaleTimeString();
+                                var tripStartTime = document.createTextNode("Start Date: "+startDate + " at " + startTime);
+                                tripStartTimeHeading.appendChild(tripStartTime);
+                        tripStartTimeRow.appendChild(tripStartTimeHeading);
+                    tripEntry.appendChild(tripStartTimeRow);
+                        //create trip end time row
+                        var tripEndTimeRow = document.createElement('div');
+                        tripEndTimeRow.setAttribute("class", "row trip-row");
+                            //create time header
+                            var tripEndTimeHeading = document.createElement('h4');
+                            //create and append calendar icon
+                                var endIcon = document.createElement('span');
+                                endIcon.setAttribute("class", "glyphicon glyphicon-log-in glyph-padd");
+                                tripEndTimeHeading.appendChild(endIcon);
+                                //create and append text
+                                var endDate = new Date(trip.endDate.iso).toDateString();
+                                var endTime = new Date(trip.endDate.iso).toLocaleTimeString();
+                                var tripEndTime = document.createTextNode("End Date: "+endDate + " at " + endTime);
+                                tripEndTimeHeading.appendChild(tripEndTime);
+                        tripEndTimeRow.appendChild(tripEndTimeHeading);
+                    tripEntry.appendChild(tripEndTimeRow);
+                    return tripEntry;
+                };
+                var getTrips = function(username){
+                    $.get(/elders/+username+'/getApprovedTrips/', function(data){
+                        var approvedTripListId = 'approvedTrips_'+username;
+                        console.log(data)
+                        var tripList = document.getElementById(approvedTripListId);
+                        for (var t = 0; t < data.length; t++){
+                            var trip = data[t];
+                            var tripListEntry = formatTripEntry(trip);
+                            tripList.appendChild(tripListEntry);
+                        }
+                    }); 
+                };
+                var getTripRequests = function(username){
+                    $.get(/elders/+username+'/getTripRequests/', function(data){
+                        var caretakerUsername = '#{user.username}';
+                        var tripRequestListId = 'tripRequests_'+username;
+                        var tripRequestList = document.getElementById(tripRequestListId);
+                        for (var r = 0; r < data.length; r++){
+                            var tripRequest = data[r];
+                            var tripId = tripRequest.objectId;
+                            var approveForm = document.createElement('form');
+                            approveForm.setAttribute("method", "post");
+                            approveForm.setAttribute("action", caretakerUsername+'/approveTripRequest/'+tripId);
+                            //create and append list entry to form
+                            var requestListEntry = formatTripEntry(tripRequest);
+                            //create and append submit button
+                            var approve_btn = document.createElement('button');
+                            approve_btn.setAttribute("class", "btn btn-default btn-primary btn-block btn-green approve-btn");
+                            approve_btn.setAttribute('type', 'submit');
+                            var approveBtnText = document.createTextNode("Approve Trip");
+                            approve_btn.appendChild(approveBtnText);
+                            requestListEntry.appendChild(approve_btn);
+                            approveForm.appendChild(requestListEntry);
+                            tripRequestList.appendChild(approveForm);
+                        }
+                    }); 
+                }; 
             for (var e = 0; e < eldersArray.length; e++){
                 var username = eldersArray[e];
                 window.onload = loadMap(username);
+                window.onload = getTrips(username);
+                window.onload = getTripRequests(username);
             }
 
       h2 Your Elders
@@ -129,7 +245,6 @@ block content
                             a(href='#tabWeeklyMap_'+item, data-toggle='tab') Weekly
                 .panel-body
                     .tab-content
-                        //#tab1loc.tab-pane.fade.in.active
                         div(id='tabCurrentMap_'+item, class='tab-pane fade active in')
                             div(id='current_map_'+item, class='map')
                         div(id='tabDailyMap_'+item, class='tab-pane fade')
@@ -235,15 +350,68 @@ block content
                                 a(href='#tabTripUpcoming_'+item, data-toggle='tab') Upcoming
                             li
                                 a(href='#tabTripRequests_'+item, data-toggle='tab') Requests
-                .panel-body
+                .panel-body.trip-panel-body
                     .tab-content
                         div(id ='tabTripCurrent_'+item, class='tab-pane fade in active')
-                            h4 Current Trips
+                            ul(id='approvedTrips_'+item).list-groups.list-group-no-padding
+                                li.list-group-item
+                                    .row.trip-row
+                                        h4.boldText
+                                            span.glyphicon.glyphicon-calendar.glyph-padd 
+                                            | Trip Name
+                                    .row.trip-row
+                                        h4
+                                            span.glyphicon.glyphicon-hourglass.glyph-padd
+                                            | Time Remaining: XX hours
+                                    .row.trip-row
+                                        h4
+                                            span.glyphicon.glyphicon-time.glyph-padd
+                                            | Started: mm/dd/yyy at hh:mm
+                                    .row.trip-row
+                                        h4
+                                            span.glyphicon.glyphicon-log-in.glyph-padd
+                                            | Ends: mm/dd/yyy at hh:mm
                         div(id ='tabTripUpcoming_'+item, class='tab-pane fade')
-                        #tab2trip.tab-pane.fade
-                            h4 Upcoming Trips
+                            ul(id='approvedTrips_'+item).list-groups.list-group-no-padding
+                                li.list-group-item
+                                    .row.trip-row
+                                        h4.boldText
+                                            span.glyphicon.glyphicon-calendar.glyph-padd 
+                                            | Trip Name
+                                    .row.trip-row
+                                        h4
+                                            span.glyphicon.glyphicon-hourglass.glyph-padd
+                                            | Duration: XX hours
+                                    .row.trip-row
+                                        h4
+                                            span.glyphicon.glyphicon-time.glyph-padd
+                                            | Starts: mm/dd/yyy at hh:mm
+                                    .row.trip-row
+                                        h4
+                                            span.glyphicon.glyphicon-log-in.glyph-padd
+                                            | Ends: mm/dd/yyy at hh:mm
                         div(id ='tabTripRequests_'+item, class='tab-pane fade')
-                            h4 Trip Requests (from elder)
+                            ul(id='tripRequests_'+item).list-groups.list-group-no-padding
+                                form(method="post", action='/elders/'+ item + '/approveTripRequest')
+                                    li.list-group-item
+                                        .row.trip-row
+                                            h4.boldText
+                                                span.glyphicon.glyphicon-calendar.glyph-padd 
+                                                | Trip Name
+                                        .row.trip-row
+                                            h4
+                                                span.glyphicon.glyphicon-hourglass.glyph-padd
+                                                | Duration: XX hours
+                                        .row.trip-row
+                                            h4
+                                                span.glyphicon.glyphicon-time.glyph-padd
+                                                | Starts: mm/dd/yyy at hh:mm
+                                        .row.trip-row
+                                            h4
+                                                span.glyphicon.glyphicon-log-in.glyph-padd
+                                                | Ends: mm/dd/yyy at hh:mm
+                                        .row.trip-row
+                                        button.btn.btn-default.btn-primary.btn-block.btn-green.approve-btn(type='submit') Approve Trip
     br
     hr    
     .row

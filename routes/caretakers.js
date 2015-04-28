@@ -4,6 +4,7 @@ var parse = require('parse').Parse;
 
 var Caretaker = parse.Object.extend('Caretaker')
 var Elder = parse.Object.extend('Elder')
+var Trip = parse.Object.extend('Trip');
 
 router.post('/:username', function(req, res, next){
     
@@ -277,6 +278,23 @@ router.post('/:username/removeElder/', function(req, res, next){
     })
 });
 
+router.post('/:username/approveTripRequest/:tripId', function(req, res){
+    var username = req.params.username;
+    var tripId = req.params.tripId;
+    console.log(username);
+    var tripQuery = new parse.Query(Trip);
+    tripQuery.get(tripId, {
+        success: function(trip) {
+            trip.set("approved", true);
+            trip.save();
+            res.status(200).redirect('back');
+        },
+        error: function(user, error){
+            res.send(500);
+            //trip not found
+        }
+    });
+});
 
 
 

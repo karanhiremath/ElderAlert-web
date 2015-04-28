@@ -28,6 +28,10 @@ p{
 	font-family: 'Open Sans', sans-serif;
 }
 
+.boldText{
+    font-weight: bold;
+}
+
 p.lead {
   margin: 5px;
   margin-bottom:10px;
@@ -140,6 +144,15 @@ label.control-label{
 #alertpanelbody{
 	height:100px;
 	overflow-y: scroll;
+}
+
+.trip-panel-body{
+	height:300px;
+	overflow-y: scroll;
+}
+
+.list-group-no-padding{
+	padding:0px !important;
 }
 
 .panel-body{
@@ -269,4 +282,21 @@ a.navbar-tab {
 #alertRow{
 	margin-top:6px;
 	margin-bottom:6px;
+}
+
+/*Trips Panel*/
+.trip-row{
+	padding-left:15px;
+}
+
+.glyph-padd{
+	margin-right:15px;
+}
+
+.approve-btn{
+	margin-left:auto;
+	margin-right:auto;
+	margin-top: 10px;
+	margin-bottom:5px;
+	width:150px;
 }
