@@ -265,7 +265,7 @@ block content
                         div(id='tabWeeklyMap_'+item, class='tab-pane fade')
                             div(id='weekly_map_'+item, class='map')
           .col-md-4.col-sm-6.col-xs-12
-              .panel.panel-default
+              .panel.panel-default.elder-panel
                     .panel-heading#with-tabs
                         .navbar-text Settings
                         ul.nav.nav-tabs
@@ -313,6 +313,7 @@ block content
                             div(id='tabSetAlerts_'+item, class='tab-pane fade')
                                 form.form-horizontal(method='post', action ='')
                                     h4#alertType Alerts
+
                                     .row#alertRow
                                         .col-md-6
                                             h4(align='center') Email Notifications
@@ -350,12 +351,12 @@ block content
                                 a(href='#tabTripCurrent_'+item, data-toggle='tab') Current
                             li
                                 a(href='#tabTripUpcoming_'+item, data-toggle='tab') Upcoming
-                            li
-                                a(href='#tabTripPast_'+item, data-toggle='tab') Past
+                            //- li
+                            //-     a(href='#tabTripPast_'+item, data-toggle='tab') Past
                             li
                                 a(href='#tabTripRequests_'+item, data-toggle='tab') Requests
 
-                .panel-body.trip-panel-body
+                .panel-body.trip-panel-body.elder-panel-body
                     .tab-content
                         div(id ='tabTripCurrent_'+item, class='tab-pane fade in active')
                             ul(id='approvedTrips_'+item).list-groups.list-group-no-padding
@@ -395,8 +396,8 @@ block content
                                         h4
                                             span.glyphicon.glyphicon-log-in.glyph-padd
                                             | Ends: mm/dd/yyy at hh:mm
-                        div(id ='tabTripPast_'+item, class='tab-pane fade')
-                            h4 past trips
+                        //- div(id ='tabTripPast_'+item, class='tab-pane fade')
+                        //-     h4 past trips
                         div(id ='tabTripRequests_'+item, class='tab-pane fade')
                             ul(id='tripRequests_'+item).list-groups.list-group-no-padding
                                 form(method="post", action='/elders/'+ item + '/approveTripRequest')
