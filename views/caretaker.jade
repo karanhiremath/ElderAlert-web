@@ -312,7 +312,7 @@ block content
                                     button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Trip
                             div(id='tabSetAlerts_'+item, class='tab-pane fade')
                                 form.form-horizontal(method='post', action ='')
-                                    h4#alertType Geofence Alerts
+                                    h4#alertType Alerts
                                     .row#alertRow
                                         .col-md-6
                                             h4(align='center') Email Notifications
@@ -322,19 +322,8 @@ block content
                                         .col-md-6
                                             h4(align='center') SMS Notifications
                                         .col-md-6.col-centered
-                                            input(type='checkbox', name='my-checkbox', checked='')
-                                    hr
-                                    h4#alertType No Motion Alerts
-                                    .row#alertRow
-                                        .col-md-6
-                                            h4(align='center') Email Notifications
-                                        .col-md-6.col-centered
-                                            input(type='checkbox', name='my-checkbox', checked='')
-                                    .row#alertRow
-                                        .col-md-6
-                                            h4(align='center') SMS Notifications
-                                        .col-md-6(margin-left='50px')
-                                            input(type='checkbox', name='my-checkbox', checked='', align='center')
+                                            input(type='checkbox', name='my-checkbox', checked='') 
+                                    button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Update Alert Settings     
                             link(type='text/css', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.css', rel='stylesheet')
                             script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.js')
                             script(type='text/javascript').
