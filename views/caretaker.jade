@@ -18,98 +18,232 @@ block content
                     h4 Alert: Elder has left geofence @ time
         
     if(elders)
+        script(type='text/javascript').
+            var eldersStr = "#{elders}";
+            var eldersArray = eldersStr.split(",");
+            var loadMap = function(username){
+                    $.get(username+'/getGeoData/', function(data){
+                        //geofence configuration
+                        console.log("get request for: " +username)
+                        var geofences = {};
+                        geofences['test'] = {
+                          center: new google.maps.LatLng(data.gfLat,data.gfLon),
+                          radius: data.gfRadius * 1000
+                        };
+                        //map options: centered @ current location
+                        var current_lat = data.mostRecentLocation.latitude;
+                        var current_lon = data.mostRecentLocation.longitude;
+                        var currentLocation = new google.maps.LatLng(current_lat,current_lon);
+                        var myOptions = {
+                            zoom: 9,
+                            center: currentLocation
+                        };
+                        //initialize 3 maps
+                        var maps = [];
+                        var current_map = new google.maps.Map(document.getElementById("current_map_"+username),
+                            myOptions);
+                        maps.push(current_map);
+                        var daily_map = new google.maps.Map(document.getElementById("daily_map_"+username),
+                            myOptions);
+                        maps.push(daily_map);
+                        var weekly_map = new google.maps.Map(document.getElementById("weekly_map_"+username),
+                            myOptions);
+                        maps.push(weekly_map);
+                        //set current location marker
+                        for (var m = 0; m < maps.length; m++ ){
+                            var location_marker = new google.maps.Marker({
+                                position: currentLocation,
+                                map: maps[m]
+                            });
+                            for ( var gf in geofences ){
+                              var geofenceOptions = {
+                                strokeColor: '#FF0000',
+                                strokeOpacity: 0.8,
+                                strokeWeight: 2,
+                                fillColor: '#FF0000',
+                                fillOpacity: 0.35,
+                                map: maps[m],
+                                center: geofences[gf].center,
+                                radius: geofences[gf].radius
+                              };
+                              geofenceCircle = new google.maps.Circle(geofenceOptions);
+                            }
+                        }
+                        //daily/weekly location path
+                        var dailyPathPoints = [];
+                        var weeklyPathPoints = [];
+                        for (var i = 0; i < data.locations.length; i++){
+                            var latitude = data.locations[i].latitude;
+                            var longitude = data.locations[i].longitude;
+                            var point = new google.maps.LatLng(latitude, longitude);
+                            //if timestamp within week, add to week array
+                            dailyPathPoints.push(point);
+                            //if timestamp within day, add to daily array
+                            weeklyPathPoints.push(point);
+                        }
+                        var dailyPath = new google.maps.Polyline({
+                          path: dailyPathPoints,
+                          geodesic: true,
+                          strokeColor: '#009ED9',
+                          strokeOpacity: 1.0,
+                          strokeWeight: 2
+                        });
+                        dailyPath.setMap(daily_map);
+                        var weeklyPath = new google.maps.Polyline({
+                          path: dailyPathPoints,
+                          geodesic: true,
+                          strokeColor: '#009ED9',
+                          strokeOpacity: 1.0,
+                          strokeWeight: 2
+                        });
+                        weeklyPath.setMap(weekly_map);
+                        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                            google.maps.event.trigger(current_map, 'resize');
+                            google.maps.event.trigger(daily_map, 'resize');
+                            google.maps.event.trigger(weekly_map, 'resize');
+                            current_map.setCenter(currentLocation);
+                            daily_map.setCenter(currentLocation);
+                            weekly_map.setCenter(currentLocation);
+                        });
+                    }); // end of $.get()
+                }; // end of loadMap
+                function formatTripEntry(trip){
+                    var tripEntry = document.createElement('li');
+                    tripEntry.setAttribute("class","list-group-item");
+                        //create trip name row
+                        var tripNameRow = document.createElement('div');
+                        tripNameRow.setAttribute("class", "row trip-row");
+                            //create name header
+                            var tripNameHeading = document.createElement('h4');
+                            tripNameHeading.setAttribute("class", "boldText");
+                                //create and append calendar icon
+                                var calendarIcon = document.createElement('span');
+                                calendarIcon.setAttribute("class", "glyphicon glyphicon-calendar glyph-padd");
+                                tripNameHeading.appendChild(calendarIcon);
+                                //create and append text
+                                var tripName = document.createTextNode(trip.tripName);
+                                tripNameHeading.appendChild(tripName);
+                        //append heading to row
+                        tripNameRow.appendChild(tripNameHeading);
+                        //append row to list-item
+                    tripEntry.appendChild(tripNameRow);
+                        //create trip start time row
+                        var tripTimeLeftRow = document.createElement('div');
+                        tripTimeLeftRow.setAttribute("class", "row trip-row");
+                            //create time header
+                            var tripTimeLeftHeading = document.createElement('h4');
+                            //create and append calendar icon
+                                var hourglassIcon = document.createElement('span');
+                                hourglassIcon.setAttribute("class", "glyphicon glyphicon-hourglass glyph-padd");
+                                tripTimeLeftHeading.appendChild(hourglassIcon);
+                                //create and append text
+                                var start = new Date(trip.startDate.iso);
+                                var end = new Date(trip.endDate.iso);
+                                var secondsLeft = (end-start) /1000;
+                                var days = parseInt(secondsLeft/86400);
+                                secondsLeft= secondsLeft % 86400;
+                                var hours = parseInt(secondsLeft/3600);
+                                secondsLeft = secondsLeft % 3600;
+                                var minutes = parseInt(secondsLeft/60);
+                                var seconds = parseInt(secondsLeft % 60);
+                                var tripTimeLeft = document.createTextNode("Duration: " + days +" days, "+hours+" hours, "+minutes+ "min, "+ seconds+ "sec");
+                                tripTimeLeftHeading.appendChild(tripTimeLeft);
+                        tripTimeLeftRow.appendChild(tripTimeLeftHeading);
+                    tripEntry.appendChild(tripTimeLeftRow);
+                        //create trip start time row
+                        var tripStartTimeRow = document.createElement('div');
+                        tripStartTimeRow.setAttribute("class", "row trip-row");
+                            //create time header
+                            var tripStartTimeHeading = document.createElement('h4');
+                            //create and append calendar icon
+                                var timeIcon = document.createElement('span');
+                                timeIcon.setAttribute("class", "glyphicon glyphicon-time glyph-padd");
+                                tripStartTimeHeading.appendChild(timeIcon);
+                                //create and append text
+                                var startDate = new Date(trip.startDate.iso).toDateString();
+                                var startTime = new Date(trip.startDate.iso).toLocaleTimeString();
+                                var tripStartTime = document.createTextNode("Start Date: "+startDate + " at " + startTime);
+                                tripStartTimeHeading.appendChild(tripStartTime);
+                        tripStartTimeRow.appendChild(tripStartTimeHeading);
+                    tripEntry.appendChild(tripStartTimeRow);
+                        //create trip end time row
+                        var tripEndTimeRow = document.createElement('div');
+                        tripEndTimeRow.setAttribute("class", "row trip-row");
+                            //create time header
+                            var tripEndTimeHeading = document.createElement('h4');
+                            //create and append calendar icon
+                                var endIcon = document.createElement('span');
+                                endIcon.setAttribute("class", "glyphicon glyphicon-log-in glyph-padd");
+                                tripEndTimeHeading.appendChild(endIcon);
+                                //create and append text
+                                var endDate = new Date(trip.endDate.iso).toDateString();
+                                var endTime = new Date(trip.endDate.iso).toLocaleTimeString();
+                                var tripEndTime = document.createTextNode("End Date: "+endDate + " at " + endTime);
+                                tripEndTimeHeading.appendChild(tripEndTime);
+                        tripEndTimeRow.appendChild(tripEndTimeHeading);
+                    tripEntry.appendChild(tripEndTimeRow);
+                    return tripEntry;
+                };
+                var getTrips = function(username){
+                    $.get(/elders/+username+'/getApprovedTrips/', function(data){
+                        var approvedTripListId = 'approvedTrips_'+username;
+                        console.log(data)
+                        var tripList = document.getElementById(approvedTripListId);
+                        for (var t = 0; t < data.length; t++){
+                            var trip = data[t];
+                            var tripListEntry = formatTripEntry(trip);
+                            tripList.appendChild(tripListEntry);
+                        }
+                    }); 
+                };
+                var getUpcomingTrips = function(username){
+                    $.get(/elders/+username+'/getUpcomingTrips/', function(data){
+                        var upcomingTripListId = 'upcomingTrips_'+username;
+                        console.log(data)
+                        var upcomingTripList = document.getElementById(upcomingTripListId);
+                        for (var t = 0; t < data.length; t++){
+                            var trip = data[t];
+                            var tripListEntry = formatTripEntry(trip);
+                            upcomingTripList.appendChild(tripListEntry);
+                        }
+                    }); 
+                };
+                var getTripRequests = function(username){
+                    $.get(/elders/+username+'/getTripRequests/', function(data){
+                        var caretakerUsername = '#{user.username}';
+                        var tripRequestListId = 'tripRequests_'+username;
+                        var tripRequestList = document.getElementById(tripRequestListId);
+                        for (var r = 0; r < data.length; r++){
+                            var tripRequest = data[r];
+                            var tripId = tripRequest.objectId;
+                            var approveForm = document.createElement('form');
+                            approveForm.setAttribute("method", "post");
+                            approveForm.setAttribute("action", caretakerUsername+'/approveTripRequest/'+tripId);
+                            //create and append list entry to form
+                            var requestListEntry = formatTripEntry(tripRequest);
+                            //create and append submit button
+                            var approve_btn = document.createElement('button');
+                            approve_btn.setAttribute("class", "btn btn-default btn-primary btn-block btn-green approve-btn");
+                            approve_btn.setAttribute('type', 'submit');
+                            var approveBtnText = document.createTextNode("Approve Trip");
+                            approve_btn.appendChild(approveBtnText);
+                            requestListEntry.appendChild(approve_btn);
+                            approveForm.appendChild(requestListEntry);
+                            tripRequestList.appendChild(approveForm);
+                        }
+                    }); 
+                }; 
+            for (var e = 0; e < eldersArray.length; e++){
+                var username = eldersArray[e];
+                window.onload = loadMap(username);
+                window.onload = getTrips(username);
+                window.onload = getTripRequests(username);
+                window.onload = getUpcomingTrips(username);
+            }
+
       h2 Your Elders
       for item in elders
         h3= item
-        script(type-'text/javascript').
-            var username = "#{item}";
-            var loadMap = function(){
-                $.get(username+'/getGeoData/', function(data){
-                    //geofence configuration
-                    var geofences = {};
-                    geofences['test'] = {
-                      center: new google.maps.LatLng(data.gfLat,data.gfLon),
-                      radius: data.gfRadius * 1000
-                    };
-                    //map options: centered @ current location
-                    var current_lat = data.mostRecentLocation.latitude;
-                    var current_lon = data.mostRecentLocation.longitude;
-                    var currentLocation = new google.maps.LatLng(current_lat,current_lon);
-                    var myOptions = {
-                        zoom: 9,
-                        center: currentLocation
-                    };
-                    //initialize 3 maps
-                    var maps = [];
-                    var current_map = new google.maps.Map(document.getElementById("current_map"),
-                        myOptions);
-                    maps.push(current_map);
-                    var daily_map = new google.maps.Map(document.getElementById("daily_map"),
-                        myOptions);
-                    maps.push(daily_map);
-                    var weekly_map = new google.maps.Map(document.getElementById("weekly_map"),
-                        myOptions);
-                    maps.push(weekly_map);
-                    //set current location marker
-                    for (var m = 0; m < maps.length; m++ ){
-                        var location_marker = new google.maps.Marker({
-                            position: currentLocation,
-                            map: maps[m]
-                        });
-                        for ( var gf in geofences ){
-                          var geofenceOptions = {
-                            strokeColor: '#FF0000',
-                            strokeOpacity: 0.8,
-                            strokeWeight: 2,
-                            fillColor: '#FF0000',
-                            fillOpacity: 0.35,
-                            map: maps[m],
-                            center: geofences[gf].center,
-                            radius: geofences[gf].radius
-                          };
-                          geofenceCircle = new google.maps.Circle(geofenceOptions);
-                        }
-                    }
-                    //daily/weekly location path
-                    var dailyPathPoints = [];
-                    var weeklyPathPoints = [];
-                    for (var i = 0; i < data.locations.length; i++){
-                        var latitude = data.locations[i].latitude;
-                        var longitude = data.locations[i].longitude;
-                        var point = new google.maps.LatLng(latitude, longitude);
-                        //if timestamp within week, add to week array
-                        dailyPathPoints.push(point);
-                        //if timestamp within day, add to daily array
-                        weeklyPathPoints.push(point);
-                    }
-                    var dailyPath = new google.maps.Polyline({
-                      path: dailyPathPoints,
-                      geodesic: true,
-                      strokeColor: '#009ED9',
-                      strokeOpacity: 1.0,
-                      strokeWeight: 2
-                    });
-                    dailyPath.setMap(daily_map);
-                    var weeklyPath = new google.maps.Polyline({
-                      path: dailyPathPoints,
-                      geodesic: true,
-                      strokeColor: '#009ED9',
-                      strokeOpacity: 1.0,
-                      strokeWeight: 2
-                    });
-                    weeklyPath.setMap(weekly_map);
-                    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-                        google.maps.event.trigger(current_map, 'resize');
-                        google.maps.event.trigger(daily_map, 'resize');
-                        google.maps.event.trigger(weekly_map, 'resize');
-                        current_map.setCenter(currentLocation);
-                        daily_map.setCenter(currentLocation);
-                        weekly_map.setCenter(currentLocation);
-                    });
-                }); //$.get()
-            };
-            window.onload = loadMap;
-
         .row
           .col-md-4.col-sm-6.col-xs-12
             .panel.with-nav-tabs.panel-default
@@ -117,33 +251,33 @@ block content
                     .navbar-text Location
                     ul.nav.nav-tabs
                         li.active
-                            a(href='#tab1loc', data-toggle='tab') Current
+                            a(href='#tabCurrentMap_'+item, data-toggle='tab') Current
                         li
-                            a(href='#tab2loc', data-toggle='tab') Daily
+                            a(href='#tabDailyMap_'+item, data-toggle='tab') Daily
                         li
-                            a(href='#tab3loc', data-toggle='tab') Weekly
+                            a(href='#tabWeeklyMap_'+item, data-toggle='tab') Weekly
                 .panel-body
                     .tab-content
-                        #tab1loc.tab-pane.fade.in.active
-                            #current_map
-                        #tab2loc.tab-pane.fade
-                            #daily_map
-                        #tab3loc.tab-pane.fade
-                            #weekly_map
+                        div(id='tabCurrentMap_'+item, class='tab-pane fade active in')
+                            div(id='current_map_'+item, class='map')
+                        div(id='tabDailyMap_'+item, class='tab-pane fade')
+                            div(id='daily_map_'+item, class='map')
+                        div(id='tabWeeklyMap_'+item, class='tab-pane fade')
+                            div(id='weekly_map_'+item, class='map')
           .col-md-4.col-sm-6.col-xs-12
               .panel.panel-default
                     .panel-heading#with-tabs
                         .navbar-text Settings
                         ul.nav.nav-tabs
                             li.active
-                                a(href='#tab1sett', data-toggle='tab') Geofences
+                                a(href='#tabSetGeofence_'+item, data-toggle='tab') Geofences
                             li
-                                a(href='#tab2sett', data-toggle='tab') Trips
+                                a(href='#tabSetTrips_'+item, data-toggle='tab') Trips
                             li
-                                a(href='#tab3sett', data-toggle='tab') Alerts
+                                a(href='#tabSetAlerts_'+item, data-toggle='tab') Alerts
                     .panel-body
                         .tab-content
-                            #tab1sett.tab-pane.fade.in.active
+                            div(id = 'tabSetGeofence_'+item, class='tab-pane fade in active')
                                 form(method="post", action='/elders/'+ item + '/updateGeofence')
                                   br
                                   h3.label Latitude*
@@ -156,29 +290,28 @@ block content
                                   input.form-control(type="number", name="radius").required
                                   br
                                   button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Update Geofence
-                            #tab2sett.tab-pane.fade
-                                form(method="post", action="") 
-                                    //TODO: make Trip object
+                            div(id='tabSetTrips_'+item, class='tab-pane fade')
+                                form(method="post", action='/elders/'+ item + '/addTrip') 
                                     br
                                     h3.label Trip Name*
-                                    input.form-control(type="text", name="tripName", placeholder="Write a description for your trip...").required
+                                    input.form-control(type="text", name="tripName", placeholder="Write a description or name for the trip...").required
                                     br
                                     .form-group
                                         h3.label Start Time*
                                         #datetimepickerStart.input-group.date 
-                                            input.form-control(type="text")
+                                            input.form-control(type="text", name="startDate").required
                                             span.input-group-addon
                                                 span.glyphicon.glyphicon-calendar
                                         br
                                         h3.label End Time*
                                         #datetimepickerEnd.input-group.date 
-                                            input.form-control(type="text")
+                                            input.form-control(type="text", name="endDate").required
                                             span.input-group-addon
                                                 span.glyphicon.glyphicon-calendar
                                         br
                                     button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Trip
-                            #tab3sett.tab-pane.fade
-                                form.form-horizontal(method='post', action = '')
+                            div(id='tabSetAlerts_'+item, class='tab-pane fade')
+                                form.form-horizontal(method='post', action ='')
                                     h4#alertType Geofence Alerts
                                     .row#alertRow
                                         .col-md-6
@@ -202,7 +335,7 @@ block content
                                             h4(align='center') SMS Notifications
                                         .col-md-6(margin-left='50px')
                                             input(type='checkbox', name='my-checkbox', checked='', align='center')
-                            link(href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.css', rel='stylesheet')
+                            link(type='text/css', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.css', rel='stylesheet')
                             script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.js')
                             script(type='text/javascript').
                                 $(function () {
@@ -225,32 +358,95 @@ block content
                     .navbar-text Trips
                     ul.nav.nav-tabs
                             li.active
-                                a(href='#tab1trip', data-toggle='tab') Current
+                                a(href='#tabTripCurrent_'+item, data-toggle='tab') Current
                             li
-                                a(href='#tab2trip', data-toggle='tab') Upcoming
+                                a(href='#tabTripUpcoming_'+item, data-toggle='tab') Upcoming
                             li
-                                a(href='#tab3trip', data-toggle='tab') Requests
-                .panel-body
+                                a(href='#tabTripPast_'+item, data-toggle='tab') Past
+                            li
+                                a(href='#tabTripRequests_'+item, data-toggle='tab') Requests
+
+                .panel-body.trip-panel-body
                     .tab-content
-                        #tab1trip.tab-pane.fade.in.active
-                            h4 Current Trips
-                        #tab2trip.tab-pane.fade
-                            h4 Upcoming Trips
-                        #tab3trip.tab-pane.fade
-                            h4 Trip Requests (from elder)
+                        div(id ='tabTripCurrent_'+item, class='tab-pane fade in active')
+                            ul(id='approvedTrips_'+item).list-groups.list-group-no-padding
+                                li.list-group-item
+                                    .row.trip-row
+                                        h4.boldText
+                                            span.glyphicon.glyphicon-calendar.glyph-padd 
+                                            | Trip Name
+                                    .row.trip-row
+                                        h4
+                                            span.glyphicon.glyphicon-hourglass.glyph-padd
+                                            | Time Remaining: XX hours
+                                    .row.trip-row
+                                        h4
+                                            span.glyphicon.glyphicon-time.glyph-padd
+                                            | Started: mm/dd/yyy at hh:mm
+                                    .row.trip-row
+                                        h4
+                                            span.glyphicon.glyphicon-log-in.glyph-padd
+                                            | Ends: mm/dd/yyy at hh:mm
+                        div(id ='tabTripUpcoming_'+item, class='tab-pane fade')
+                            ul(id='upcomingTrips_'+item).list-groups.list-group-no-padding
+                                li.list-group-item
+                                    .row.trip-row
+                                        h4.boldText
+                                            span.glyphicon.glyphicon-calendar.glyph-padd 
+                                            | Trip Name
+                                    .row.trip-row
+                                        h4
+                                            span.glyphicon.glyphicon-hourglass.glyph-padd
+                                            | Duration: XX hours
+                                    .row.trip-row
+                                        h4
+                                            span.glyphicon.glyphicon-time.glyph-padd
+                                            | Starts: mm/dd/yyy at hh:mm
+                                    .row.trip-row
+                                        h4
+                                            span.glyphicon.glyphicon-log-in.glyph-padd
+                                            | Ends: mm/dd/yyy at hh:mm
+                        div(id ='tabTripPast_'+item, class='tab-pane fade')
+                            h4 past trips
+                        div(id ='tabTripRequests_'+item, class='tab-pane fade')
+                            ul(id='tripRequests_'+item).list-groups.list-group-no-padding
+                                form(method="post", action='/elders/'+ item + '/approveTripRequest')
+                                    li.list-group-item
+                                        .row.trip-row
+                                            h4.boldText
+                                                span.glyphicon.glyphicon-calendar.glyph-padd 
+                                                | Trip Name
+                                        .row.trip-row
+                                            h4
+                                                span.glyphicon.glyphicon-hourglass.glyph-padd
+                                                | Duration: XX hours
+                                        .row.trip-row
+                                            h4
+                                                span.glyphicon.glyphicon-time.glyph-padd
+                                                | Starts: mm/dd/yyy at hh:mm
+                                        .row.trip-row
+                                            h4
+                                                span.glyphicon.glyphicon-log-in.glyph-padd
+                                                | Ends: mm/dd/yyy at hh:mm
+                                        .row.trip-row
+                                        button.btn.btn-default.btn-primary.btn-block.btn-green.approve-btn(type='submit') Approve Trip
     br
     hr    
     .row
-        .col-xs-6
-            h2 Pending Elders
-            ul
-                if (elder_requests) 
-                for item in elder_requests
-                    li
-                        h3= item
-        .col-xs-6
+        .col-md-3
+            .panel.panel-default
+                .panel-heading Pending Elders
+                .panel-body
+                    ul
+                        if (elder_requests) 
+                            for item in elder_requests
+                                li
+                                    h4= item
+                        else
+                            h4 You do not have any pending elder confirmations at this time
+        .col-md-3
             if(user.role=='caretaker')
-            .panel.panel-default#addelderpanel
+            .panel.panel-default
                 .panel-heading Add an Elder to your account:
                 .panel-body
                     h3= addError
@@ -261,6 +457,27 @@ block content
                         input.form-control(type="text", name="phone").required
                         br
                         button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Elder
+        .col-md-3
+            .panel.panel-default
+                .panel-heading Current Elders
+                .panel-body
+                    ul
+                        if (elders)
+                        for item in elders
+                            li
+                                h4=item
+        .col-md-3
+            if(user.role=='caretaker')
+            .panel.panel-default
+                .panel-heading Remove an Elder from your account:
+                .panel-body
+                    h4= addError
+                    form(method="post",  action=user.username + '/removeElder')
+                        h3.label Elder Username*
+                        input.form-control(type="text", name="elderUsername").required
+                        br
+                        button.btn.btn-lg.btn-primary.btn-block.btn-red(type='submit') Remove Elder
+
 
 
 

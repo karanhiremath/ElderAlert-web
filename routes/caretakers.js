@@ -4,6 +4,7 @@ var parse = require('parse').Parse;
 
 var Caretaker = parse.Object.extend('Caretaker')
 var Elder = parse.Object.extend('Elder')
+var Trip = parse.Object.extend('Trip');
 
 router.post('/:username', function(req, res, next){
     
@@ -84,7 +85,6 @@ router.post('/:username', function(req, res, next){
 router.get('/:username', function(req,res,next){
     
     var username = req.params.username;
-    var z = 0;
     var query = new parse.Query(parse.User);
     query.equalTo("username",username);
     query.find({
@@ -110,60 +110,6 @@ router.get('/:username', function(req,res,next){
                             elders = caretaker.elders;
                             console.log(elders)
                             var elder_requests = caretaker.elder_requests;
-                            /*var geofenceData = {};
-                            var elderMapData =[];
-                            var geofence;
-                            var geofenceAtt;
-                            var gf_centerlat;
-                            var gf_centerlon;
-                            var gf_radius;
-                            for (var i = 0; i < elders.length ; i++){
-                                var elderIdQuery = new parse.Query(Elder);
-                                var e = elders[i];
-                                elderIdQuery.equalTo("user.username", e);
-                                elderIdQuery.find({
-                                    success: function(elders){
-                                        if (elders.length > 0){
-                                            var elderId = elders[0].id
-                                            console.log("sucess found elderId: " + elderId)
-
-                                            var elderObjQuery = new parse.Query(Elder);
-                                            elderObjQuery.include("geofence");
-                                            elderObjQuery.get(elderId, {
-                                                success: function(elder){
-                                                    var foundElder = elder.attributes;
-                                                    console.log(foundElder)
-                                                    console.log("queried elder username:" +elder.get("user").username);
-                                                    geofence = foundElder.geofence;
-                                                    geofenceAtt = geofence.attributes;
-                                                    gf_centerlat = geofence.get("location").latitude;
-                                                    gf_centerlon = geofence.get("location").longitude;
-                                                    gf_radius = geofenceAtt.radius;
-                                                    console.log("geofence center lat: "+gf_centerlat)
-                                                    console.log("geofence center lon: "+gf_centerlon)
-                                                    console.log("geofence radius: "+gf_radius)
-                                                    geofenceData = {
-                                                        gf_lat: gf_centerlat,
-                                                        gf_lon: gf_centerlon,
-                                                        gf_radius: gf_radius
-                                                    };
-                                                    //console.log(geofenceData)
-                                                    elderMapData[i] = geofenceData;
-                                                    console.log(elderMapData)
-                                                    z++;
-                                                    console.log(z)
-                                                    if(z == elders.length){
-                                                        res.render('caretaker',{
-                                                            geofence_data: elderMapData
-                                                        });
-                                                    }
-                                                },
-                                                error:function(elder,error){}
-                                            })
-                                        } //if elders.length
-                                    }//elderIdQuery
-                                })//elderIdQuery.find
-                            }//for elders.length*/
                             console.log(elder_requests)
                             res.render('caretaker',
                             {
@@ -266,6 +212,89 @@ router.post('/',function(req,res,next){
         }
     })
 })
+
+router.post('/:username/removeElder/', function(req, res, next){
+    var elderUsername = req.body.elderUsername;
+    var caretakerUsername = req.params.username;
+    
+    var elderIdQuery = new parse.Query(Elder);
+    elderIdQuery.equalTo("user.username",elderUsername);
+    elderIdQuery.find({
+        success: function(elders) {
+            if(elders.length > 0){
+
+                var elderId = elders[0].id 
+
+                var elderObjQuery = new parse.Query(Elder);
+                elderObjQuery.get(elderId,{
+                    success: function(elder) {
+
+                        var caretakerIdQuery = new parse.Query(Caretaker)
+                        caretakerIdQuery.equalTo("user.username",caretakerUsername);
+                        caretakerIdQuery.find({
+                            success: function(caretakers){
+                                
+                                if(caretakers.length > 0){
+                                    var caretakerId = caretakers[0].id 
+
+                                    var caretakerObjQuery = new parse.Query(Caretaker);
+                                    caretakerObjQuery.get(caretakerId,{
+                                        success: function(caretaker) {
+                                            
+                                            var elders= caretaker.get("elders");
+                                            var caretakers = elder.get("caretakers");
+                                            
+                                            var elderIndex = elders.indexOf(elderUsername);
+
+                                            if (elderIndex > -1){
+
+                                                elders.splice(elderIndex,1);
+                                                caretakers.splice(caretakers.indexOf(caretakerUsername),1);
+                                                elder.set("caretaker",caretakers);
+                                                caretaker.set("elders",elders);
+
+                                                elder.save();
+                                                caretaker.save();
+                                                res.status(200).redirect('/caretakers/'+caretakerUsername);
+                                            }
+                                            else{ //TODO: redirect/show message that elder was not found
+                                                res.render('caretaker',
+                                                {
+                                                    user:caretaker.get("user"),
+                                                    topError:"",
+                                                    addError:"Elder not found."
+                                                });
+                                               
+                                            }
+                                        }
+                                    })
+                                }
+                            }
+                        })
+                    }
+                })
+            }
+        }
+    })
+});
+
+router.post('/:username/approveTripRequest/:tripId', function(req, res){
+    var username = req.params.username;
+    var tripId = req.params.tripId;
+    console.log(username);
+    var tripQuery = new parse.Query(Trip);
+    tripQuery.get(tripId, {
+        success: function(trip) {
+            trip.set("approved", true);
+            trip.save();
+            res.status(200).redirect('back');
+        },
+        error: function(user, error){
+            res.send(500);
+            //trip not found
+        }
+    });
+});
 
 
 

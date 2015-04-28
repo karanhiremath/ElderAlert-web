@@ -6,7 +6,8 @@ var Elder = parse.Object.extend('Elder')
 var Caretaker = parse.Object.extend('Caretaker')
 var Geofence = require('./geofence');
 var Alert = require('./alert');
-
+var Trip = require('./trip');
+var TripQ = parse.Object.extend('Trip');
 
 
 router.post('/confirm', function(req,res,next){
@@ -259,7 +260,6 @@ var checkForGeofenceAlert = function(elder, currentLocation){
 
 router.post('/:username/updateGeofence', function(req, res){
     var username = req.params.username;
-    console.log(username);
     var elderIdQuery = new parse.Query(Elder);
     elderIdQuery.equalTo("user.username",username);
     elderIdQuery.find({
@@ -285,5 +285,136 @@ router.post('/:username/updateGeofence', function(req, res){
         }
     });
 });
+
+router.post('/:username/addTrip', function(req, res){
+    var username = req.params.username;
+    var tripName = req.body.tripName;
+    var startDateStr = req.body.startDate;
+    var endDateStr = req.body.endDate;
+    var startDate = new Date(startDateStr);
+    var endDate = new Date(endDateStr);
+    console.log(username);
+    var elderIdQuery = new parse.Query(Elder);
+    elderIdQuery.equalTo("user.username",username);
+    elderIdQuery.find({
+        success: function(elders) {
+            if(elders.length > 0){
+                var elderId = elders[0].id;
+                var elderObjQuery = new parse.Query(Elder);
+                elderObjQuery.get(elderId,{
+                    success: function(elder) {
+                        var trip = Trip.spawn(elder.get("user").username, tripName, true, startDate, endDate);
+                        trip.save();
+                        res.status(200).redirect('back');
+                    },
+                      error: function(user, error) {
+                        console.log(error);
+                        res.send(500);
+                        // The object was not retrieved successfully.
+                    }
+                });
+            }
+        }
+    });
+});
+
+router.get('/:username/getApprovedTrips', function(req,res){
+    var username = req.params.username;
+    console.log(username);
+    var elderIdQuery = new parse.Query(Elder);
+    elderIdQuery.equalTo("user.username",username);
+    elderIdQuery.find({
+        success: function(elders) {
+            if(elders.length > 0){
+                var elderId = elders[0].id;
+                var elderObjQuery = new parse.Query(Elder);
+                elderObjQuery.get(elderId,{
+                    success: function(elder) {
+                        var tripQuery = new parse.Query(TripQ);
+                        tripQuery.equalTo("elderUsername", username);
+                        tripQuery.equalTo("approved", true);
+                        tripQuery.ascending("startDate");
+                        tripQuery.find({
+                            success:function(trips){
+                                res.send(trips);
+                            }
+                        });
+                    },
+                      error: function(user, error) {
+                        console.log(error);
+                        res.send(500);//elder not found
+                    }
+                });
+            }
+        }
+    }); 
+});
+
+router.get('/:username/getUpcomingTrips', function(req,res){
+    var username = req.params.username;
+    console.log(username);
+    var elderIdQuery = new parse.Query(Elder);
+    elderIdQuery.equalTo("user.username",username);
+    elderIdQuery.find({
+        success: function(elders) {
+            if(elders.length > 0){
+                var elderId = elders[0].id;
+                var elderObjQuery = new parse.Query(Elder);
+                elderObjQuery.get(elderId,{
+                    success: function(elder) {
+                        var tripQuery = new parse.Query(TripQ);
+                        tripQuery.equalTo("elderUsername", username);
+                        tripQuery.equalTo("approved", true);
+                        var currentDate = new Date();
+                        tripQuery.greaterThan("startDate", currentDate);
+                        tripQuery.find({
+                            success:function(trips){
+                                res.send(trips);
+                            }
+                        });
+                    },
+                      error: function(user, error) {
+                        console.log(error);
+                        res.send(500);//elder not found
+                    }
+                });
+            }
+        }
+    }); 
+});
+
+router.get('/:username/getTripRequests', function(req,res){
+    var username = req.params.username;
+    console.log(username);
+    var elderIdQuery = new parse.Query(Elder);
+    elderIdQuery.equalTo("user.username",username);
+    elderIdQuery.find({
+        success: function(elders) {
+            if(elders.length > 0){
+                var elderId = elders[0].id;
+                var elderObjQuery = new parse.Query(Elder);
+                elderObjQuery.get(elderId,{
+                    success: function(elder) {
+                        var tripQuery = new parse.Query(TripQ);
+                        tripQuery.equalTo("elderUsername", username);
+                        tripQuery.equalTo("approved", false);
+                        tripQuery.ascending("startDate");
+                        tripQuery.find({
+                            success:function(trips){
+                                res.send(trips);
+                            }
+                        });
+                    },
+                      error: function(user, error) {
+                        console.log(error);
+                        res.send(500);//elder not found
+                    }
+                });
+            }
+        }
+    }); 
+});
+
+
 
 module.exports = router;
