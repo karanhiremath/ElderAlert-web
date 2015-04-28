@@ -196,6 +196,18 @@ block content
                         }
                     }); 
                 };
+                var getUpcomingTrips = function(username){
+                    $.get(/elders/+username+'/getUpcomingTrips/', function(data){
+                        var upcomingTripListId = 'upcomingTrips_'+username;
+                        console.log(data)
+                        var upcomingTripList = document.getElementById(upcomingTripListId);
+                        for (var t = 0; t < data.length; t++){
+                            var trip = data[t];
+                            var tripListEntry = formatTripEntry(trip);
+                            upcomingTripList.appendChild(tripListEntry);
+                        }
+                    }); 
+                };
                 var getTripRequests = function(username){
                     $.get(/elders/+username+'/getTripRequests/', function(data){
                         var caretakerUsername = '#{user.username}';
@@ -226,6 +238,7 @@ block content
                 window.onload = loadMap(username);
                 window.onload = getTrips(username);
                 window.onload = getTripRequests(username);
+                window.onload = getUpcomingTrips(username);
             }
 
       h2 Your Elders
@@ -349,7 +362,10 @@ block content
                             li
                                 a(href='#tabTripUpcoming_'+item, data-toggle='tab') Upcoming
                             li
+                                a(href='#tabTripPast_'+item, data-toggle='tab') Past
+                            li
                                 a(href='#tabTripRequests_'+item, data-toggle='tab') Requests
+
                 .panel-body.trip-panel-body
                     .tab-content
                         div(id ='tabTripCurrent_'+item, class='tab-pane fade in active')
@@ -372,7 +388,7 @@ block content
                                             span.glyphicon.glyphicon-log-in.glyph-padd
                                             | Ends: mm/dd/yyy at hh:mm
                         div(id ='tabTripUpcoming_'+item, class='tab-pane fade')
-                            ul(id='approvedTrips_'+item).list-groups.list-group-no-padding
+                            ul(id='upcomingTrips_'+item).list-groups.list-group-no-padding
                                 li.list-group-item
                                     .row.trip-row
                                         h4.boldText
@@ -390,6 +406,8 @@ block content
                                         h4
                                             span.glyphicon.glyphicon-log-in.glyph-padd
                                             | Ends: mm/dd/yyy at hh:mm
+                        div(id ='tabTripPast_'+item, class='tab-pane fade')
+                            h4 past trips
                         div(id ='tabTripRequests_'+item, class='tab-pane fade')
                             ul(id='tripRequests_'+item).list-groups.list-group-no-padding
                                 form(method="post", action='/elders/'+ item + '/approveTripRequest')

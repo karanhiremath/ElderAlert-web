@@ -346,6 +346,39 @@ router.get('/:username/getApprovedTrips', function(req,res){
     }); 
 });
 
+router.get('/:username/getUpcomingTrips', function(req,res){
+    var username = req.params.username;
+    console.log(username);
+    var elderIdQuery = new parse.Query(Elder);
+    elderIdQuery.equalTo("user.username",username);
+    elderIdQuery.find({
+        success: function(elders) {
+            if(elders.length > 0){
+                var elderId = elders[0].id;
+                var elderObjQuery = new parse.Query(Elder);
+                elderObjQuery.get(elderId,{
+                    success: function(elder) {
+                        var tripQuery = new parse.Query(TripQ);
+                        tripQuery.equalTo("elderUsername", username);
+                        tripQuery.equalTo("approved", true);
+                        var currentDate = new Date();
+                        tripQuery.greaterThan("startDate", currentDate);
+                        tripQuery.find({
+                            success:function(trips){
+                                res.send(trips);
+                            }
+                        });
+                    },
+                      error: function(user, error) {
+                        console.log(error);
+                        res.send(500);//elder not found
+                    }
+                });
+            }
+        }
+    }); 
+});
+
 router.get('/:username/getTripRequests', function(req,res){
     var username = req.params.username;
     console.log(username);
