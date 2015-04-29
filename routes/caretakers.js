@@ -95,8 +95,8 @@ router.get('/:username', function(req,res,next){
             caretakerQuery.find({
                 success: function(caretakers) {
                     if(caretakers[0]) {
+                        
                         var caretaker = caretakers[0].attributes
-
                         if(req.get('Content-type')=="application/json"){
                                 
                                return res.status(200).json({
@@ -104,7 +104,12 @@ router.get('/:username', function(req,res,next){
                                 })
                                
                         } else{
-                            console.log(caretaker)    
+                            console.log(caretaker) 
+                            var email = caretaker.email
+                            var sms = caretaker.sms  
+                            console.log(caretaker)
+                            console.log(email)
+                            console.log(sms) 
                             user = caretaker.user;
                             console.log(user)
                             elders = caretaker.elders;
@@ -115,6 +120,8 @@ router.get('/:username', function(req,res,next){
                             {
                             user:user,
                             caretaker:caretaker,
+                            email:email,
+                            sms:sms,
                             elders:elders,
                             elder_requests: elder_requests,
                             topError:"",
@@ -129,13 +136,20 @@ router.get('/:username', function(req,res,next){
 
                         caretaker.save(null, {
                             success: function(caretaker) {
-                                caretaker = caretaker.attributes
+                                var email = caretaker.email
+                                var sms = caretaker.sms
                                 console.log(caretaker)
+                                console.log(email)
+                                console.log(sms)
+                                caretaker = caretaker.attributes
+                                
                                 elders = caretaker.elders
                                 res.render('caretaker',
                                 {
                                     user:user,
                                     caretaker:caretaker,
+                                    email:email,
+                                    sms:sms,
                                     elders:elders,
                                     topError:"",
                                     addError:""
@@ -295,7 +309,43 @@ router.post('/:username/approveTripRequest/:tripId', function(req, res){
         }
     });
 });
+router.post('/:username/alertSettings', function(req, res){
+    var sms = req.body.sms;
+    var email = req.body.email;
+    if(sms == "on"){
+        sms = true;
+    }
+    else{
+        sms = false;
+    }
+    if(email == "on"){
+        email = true;
+    }
+    else{
+        email = false;
+    }
+    var caretakerUsername = req.params.username;
+    var caretakerIdQuery = new parse.Query(Caretaker)
+    caretakerIdQuery.equalTo("user.username",caretakerUsername);
+    caretakerIdQuery.find({
+        success: function(caretakers){
+            
+            if(caretakers.length > 0){
+                var caretakerId = caretakers[0].id 
 
+                var caretakerObjQuery = new parse.Query(Caretaker);
+                caretakerObjQuery.get(caretakerId,{
+                    success: function(caretaker) {
+                        caretaker.set("sms",sms);
+                        caretaker.set("email",email);
+                        caretaker.save();
+                    }
+                })
+            }
+        }
+    });
+                        
+});
 
 
 module.exports = router

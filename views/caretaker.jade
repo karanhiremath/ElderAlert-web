@@ -311,27 +311,37 @@ block content
                                         br
                                     button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Trip
                             div(id='tabSetAlerts_'+item, class='tab-pane fade')
-                                form.form-horizontal(method='post', action ='')
+                                form.form-horizontal(method='post', action =user.username+'/alertSettings')
                                     h4#alertType Alerts
                                     .row#alertRow
                                         .col-md-6
                                             h4(align='center') Email Notifications
                                         .col-md-6
-                                            input(type='checkbox', name='my-checkbox', checked='')
+                                            input(type='checkbox', name='email', checked='')
                                     .row#alertRow
                                         .col-md-6
                                             h4(align='center') SMS Notifications
                                         .col-md-6.col-centered
-                                            input(type='checkbox', name='my-checkbox', checked='') 
+                                            input(type='checkbox', name='sms', checked='') 
                                     button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Update Alert Settings     
                             link(type='text/css', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.css', rel='stylesheet')
                             script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.js')
                             script(type='text/javascript').
                                 $(function () {
-                                    $("[name='my-checkbox']").bootstrapSwitch({
+                                    var email1 = #{email};
+                                    var sms1 = #{sms};
+                                    console.log("here");
+                                    $("[name='email']").bootstrapSwitch({
                                         onColor:'success',
                                         size:'small'
                                         });
+                                    $("[name='sms']").bootstrapSwitch({
+                                        onColor:'success',
+                                        size:'small'
+                                        });
+                                    $("[name='email']").bootstrapSwitch('state', #{email});
+                                    $("[name='sms']").bootstrapSwitch('state', #{sms});
+                                
                                     $('#datetimepickerStart').datetimepicker();
                                     $('#datetimepickerEnd').datetimepicker();
                                     $("#datetimepickerStart").on("dp.change", function (e) {
