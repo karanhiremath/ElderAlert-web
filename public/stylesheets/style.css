@@ -98,6 +98,10 @@ label.control-label{
 
 /*Panels */
 
+.elder-panel-body{
+	min-height:300px;
+}
+
 #alertpanel{
 	padding-right:5px;
 	padding-left:5px;
