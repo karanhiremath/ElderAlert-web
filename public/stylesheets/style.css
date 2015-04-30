@@ -283,9 +283,9 @@ a.navbar-tab {
 	margin-top:10px;
 }
 
-#alertRow{
-	margin-top:6px;
-	margin-bottom:6px;
+.alert-row{
+	margin-top:15px;
+	margin-bottom:15px;
 }
 
 /*Trips Panel*/

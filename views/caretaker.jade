@@ -275,7 +275,7 @@ block content
                                 a(href='#tabSetTrips_'+item, data-toggle='tab') Trips
                             li
                                 a(href='#tabSetAlerts_'+item, data-toggle='tab') Alerts
-                    .panel-body
+                    .panel-body.elder-panel-body
                         .tab-content
                             div(id = 'tabSetGeofence_'+item, class='tab-pane fade in active')
                                 form(method="post", action='/elders/'+ item + '/updateGeofence')
@@ -296,34 +296,36 @@ block content
                                     h3.label Trip Name*
                                     input.form-control(type="text", name="tripName", placeholder="Write a description or name for the trip...").required
                                     br
-                                    .form-group
-                                        h3.label Start Time*
-                                        #datetimepickerStart.input-group.date 
-                                            input.form-control(type="text", name="startDate").required
-                                            span.input-group-addon
-                                                span.glyphicon.glyphicon-calendar
-                                        br
-                                        h3.label End Time*
-                                        #datetimepickerEnd.input-group.date 
-                                            input.form-control(type="text", name="endDate").required
-                                            span.input-group-addon
-                                                span.glyphicon.glyphicon-calendar
-                                        br
+                                    h3.label Start Time*
+                                    #datetimepickerStart.input-group.date 
+                                        input.form-control(type="text", name="startDate").required
+                                        span.input-group-addon
+                                            span.glyphicon.glyphicon-calendar
+                                    br
+                                    h3.label End Time*
+                                    #datetimepickerEnd.input-group.date 
+                                        input.form-control(type="text", name="endDate").required
+                                        span.input-group-addon
+                                            span.glyphicon.glyphicon-calendar
+                                    br
                                     button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Trip
                             div(id='tabSetAlerts_'+item, class='tab-pane fade')
                                 form.form-horizontal(method='post', action =user.username+'/alertSettings')
-                                    h4#alertType Alerts
-
-                                    .row#alertRow
+                                    br
+                                    h4(style='margin: 10px') Set your alert notification preferences below:
+                                    br
+                                    .row.alert-row
                                         .col-md-6
                                             h4(align='center') Email Notifications
                                         .col-md-6
                                             input(type='checkbox', name='email', checked='')
-                                    .row#alertRow
+                                    .row.alert-row
                                         .col-md-6
                                             h4(align='center') SMS Notifications
                                         .col-md-6.col-centered
                                             input(type='checkbox', name='sms', checked='') 
+                                    br
+                                    br
                                     button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Update Alert Settings     
                             link(type='text/css', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.css', rel='stylesheet')
                             script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.js')
@@ -334,11 +336,11 @@ block content
                                     console.log("here");
                                     $("[name='email']").bootstrapSwitch({
                                         onColor:'success',
-                                        size:'small'
+                                        size:'normal'
                                         });
                                     $("[name='sms']").bootstrapSwitch({
                                         onColor:'success',
-                                        size:'small'
+                                        size:'normal'
                                         });
                                     $("[name='email']").bootstrapSwitch('state', #{email});
                                     $("[name='sms']").bootstrapSwitch('state', #{sms});
