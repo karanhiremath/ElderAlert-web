@@ -275,7 +275,7 @@ block content
                                 a(href='#tabSetTrips_'+item, data-toggle='tab') Trips
                             li
                                 a(href='#tabSetAlerts_'+item, data-toggle='tab') Alerts
-                    .panel-body
+                    .panel-body.elder-panel-body
                         .tab-content
                             div(id = 'tabSetGeofence_'+item, class='tab-pane fade in active')
                                 form(method="post", action='/elders/'+ item + '/updateGeofence')
@@ -296,52 +296,73 @@ block content
                                     h3.label Trip Name*
                                     input.form-control(type="text", name="tripName", placeholder="Write a description or name for the trip...").required
                                     br
-                                    .form-group
-                                        h3.label Start Time*
-                                        #datetimepickerStart.input-group.date 
-                                            input.form-control(type="text", name="startDate").required
-                                            span.input-group-addon
-                                                span.glyphicon.glyphicon-calendar
-                                        br
-                                        h3.label End Time*
-                                        #datetimepickerEnd.input-group.date 
-                                            input.form-control(type="text", name="endDate").required
-                                            span.input-group-addon
-                                                span.glyphicon.glyphicon-calendar
-                                        br
+                                    h3.label Start Time*
+                                    div(id='datetimepickerStart_'+item, class='input-group date')
+                                        input.form-control(type="text", name="startDate").required
+                                        span.input-group-addon
+                                            span.glyphicon.glyphicon-calendar
+                                    br
+                                    h3.label End Time*
+                                    div(id='datetimepickerEnd_'+item, class='input-group date')
+                                        input.form-control(type="text", name="endDate").required
+                                        span.input-group-addon
+                                            span.glyphicon.glyphicon-calendar
+                                    br
                                     button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Trip
                             div(id='tabSetAlerts_'+item, class='tab-pane fade')
-                                form.form-horizontal(method='post', action ='')
-                                    h4#alertType Alerts
-
-                                    .row#alertRow
+                                form.form-horizontal(method='post', action =user.username+'/alertSettings')
+                                    br
+                                    h4(style='margin: 10px') Set your alert notification preferences below:
+                                    br
+                                    .row.alert-row
                                         .col-md-6
                                             h4(align='center') Email Notifications
                                         .col-md-6
-                                            input(type='checkbox', name='my-checkbox', checked='')
-                                    .row#alertRow
+                                            input(type='checkbox', name='email_toggle_'+item, checked='')
+                                    .row.alert-row
                                         .col-md-6
                                             h4(align='center') SMS Notifications
                                         .col-md-6.col-centered
-                                            input(type='checkbox', name='my-checkbox', checked='') 
+                                            input(type='checkbox', name='sms_toggle_'+item, checked='') 
+                                    br
+                                    br
                                     button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Update Alert Settings     
                             link(type='text/css', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.css', rel='stylesheet')
                             script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.js')
                             script(type='text/javascript').
-                                $(function () {
-                                    $("[name='my-checkbox']").bootstrapSwitch({
+                                var switches = function (elderUsername) {
+                                    var emailToggleStr = "[name='email_toggle_"+elderUsername;
+                                    var email_switch = emailToggleStr.concat("']");
+                                    var smsToggleStr = "[name='sms_toggle_"+elderUsername;
+                                    var sms_switch = smsToggleStr.concat("']");
+                                    $(email_switch).bootstrapSwitch({
                                         onColor:'success',
-                                        size:'small'
+                                        size:'normal'
                                         });
-                                    $('#datetimepickerStart').datetimepicker();
-                                    $('#datetimepickerEnd').datetimepicker();
-                                    $("#datetimepickerStart").on("dp.change", function (e) {
-                                    $('#datetimepickerEnd').data("DateTimePicker").minDate(e.date);
+                                    $(sms_switch).bootstrapSwitch({
+                                        onColor:'success',
+                                        size:'normal'
+                                        });
+                                    $(emailToggleStr).bootstrapSwitch('state', #{email});
+                                    $(smsToggleStr).bootstrapSwitch('state', #{sms});
+                                    var dateStartStr = "#datetimepickerStart_"+ elderUsername;
+                                    var dateEndStr = "#datetimepickerEnd_"+ elderUsername;
+                                    $(dateStartStr).datetimepicker();
+                                    $(dateEndStr).datetimepicker();
+                                    $(dateStartStr).on("dp.change", function (e) {
+                                    $(dateEndStr).data("DateTimePicker").minDate(e.date);
                                     });
-                                    $("#datetimepickerEnd").on("dp.change", function (e) {
-                                    $('#datetimepickerStart').data("DateTimePicker").maxDate(e.date);
+                                    $(dateEndStr).on("dp.change", function (e) {
+                                    $(dateStartStr).data("DateTimePicker").maxDate(e.date);
                                     });
-                                });
+                                };
+                                var eldersStr = "#{elders}";
+                                var eldersArray = eldersStr.split(",");
+                                for (var s = 0; s < eldersArray.length; s++){
+                                    var elderUsername = eldersArray[s];
+                                    window.onload = switches(elderUsername);
+
+                                }
           .col-md-4.col-sm-6.col-xs-12
             .panel.panel-default
                 .panel-heading#with-tabs
