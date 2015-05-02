@@ -164,11 +164,10 @@ router.post('/:username/update', function(req,res){
                             elder.set("mostRecentLocation", currentLocation);
                         }
                         var locationToAdd = Location.spawn(parseFloat(latitude), parseFloat(longitude));
-                        console.log(locationToAdd);
                         elder.addUnique("locations", locationToAdd);
                         elder.save({
                             success: function(elder) {
-                                formAlerts(elder, currentLocation);
+                                tripsActive(elder, currentLocation); 
                                 res.sendStatus(200);
                             },
                             error: function(elder, error) {
@@ -200,7 +199,6 @@ var checkLastLocation = function(elder, currentLocation) {
 
 var formAlerts = function(elder, currentLocation) {
     var query = new parse.Query(Alert);
-    console.log(elder);
     query.equalTo("elder", elder.get("user").username);
     query.equalTo("dismissed", false);
     var geofenceAlertPresent = false;
@@ -208,8 +206,6 @@ var formAlerts = function(elder, currentLocation) {
 
     query.find({
         success: function(alerts) {
-            console.log("alerts:");
-            console.log(alerts);
             for (var i = 0; i < alerts.length; i++) {
                 if(alerts[i].attributes.type === "geofence-trespassed") {
                     geofenceAlertPresent = true;
@@ -233,7 +229,31 @@ var formAlerts = function(elder, currentLocation) {
         error: function(error) {
             console.log("Error: " + error.code + " " + error.message);
         }
+    });
+};
 
+var tripsActive = function(elder, currentLocation) {
+    console.log("trips active function, checking now");
+    var tripQuery = new parse.Query(Trip);
+    tripQuery.equalTo("elderUsername", elder.get("user").username);
+    tripQuery.equalTo("approved", true);
+    tripQuery.find({
+        success: function(trips) {
+            console.log("found trips");
+            for(var i in trips) {
+                var trip = trips[i].attributes;
+                console.log(trip.startDate);
+                console.log(trip.endDate);
+                if(Date.now() > trip.startDate && Date.now() < trip.endDate) {
+                    console.log("found active trip");
+                    console.log(true);
+                    return true;
+                }
+            }
+            formAlerts(elder, currentLocation);
+        },
+        error: function(error) {
+        }
     });
 };
 
