@@ -313,6 +313,7 @@ block content
                                         span.input-group-addon
                                             span.glyphicon.glyphicon-calendar
                                     br
+                                    input(type="hidden" name="approved" value="true")
                                     button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Trip
                             div(id='tabSetAlerts_'+item, class='tab-pane fade')
                                 form.form-horizontal(method='post', action =user.username+'/alertSettings')

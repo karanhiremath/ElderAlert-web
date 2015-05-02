@@ -164,11 +164,10 @@ router.post('/:username/update', function(req,res){
                             elder.set("mostRecentLocation", currentLocation);
                         }
                         var locationToAdd = Location.spawn(parseFloat(latitude), parseFloat(longitude));
-                        console.log(locationToAdd);
                         elder.addUnique("locations", locationToAdd);
                         elder.save({
                             success: function(elder) {
-                                formAlerts(elder, currentLocation);
+                                tripsActive(elder, currentLocation); 
                                 res.sendStatus(200);
                             },
                             error: function(elder, error) {
@@ -200,7 +199,6 @@ var checkLastLocation = function(elder, currentLocation) {
 
 var formAlerts = function(elder, currentLocation) {
     var query = new parse.Query(Alert);
-    console.log(elder);
     query.equalTo("elder", elder.get("user").username);
     query.equalTo("dismissed", false);
     var geofenceAlertPresent = false;
@@ -208,8 +206,6 @@ var formAlerts = function(elder, currentLocation) {
 
     query.find({
         success: function(alerts) {
-            console.log("alerts:");
-            console.log(alerts);
             for (var i = 0; i < alerts.length; i++) {
                 if(alerts[i].attributes.type === "geofence-trespassed") {
                     geofenceAlertPresent = true;
@@ -233,7 +229,31 @@ var formAlerts = function(elder, currentLocation) {
         error: function(error) {
             console.log("Error: " + error.code + " " + error.message);
         }
+    });
+};
 
+var tripsActive = function(elder, currentLocation) {
+    console.log("trips active function, checking now");
+    var tripQuery = new parse.Query(Trip);
+    tripQuery.equalTo("elderUsername", elder.get("user").username);
+    tripQuery.equalTo("approved", true);
+    tripQuery.find({
+        success: function(trips) {
+            console.log("found trips");
+            for(var i in trips) {
+                var trip = trips[i].attributes;
+                console.log(trip.startDate);
+                console.log(trip.endDate);
+                if(Date.now() > trip.startDate && Date.now() < trip.endDate) {
+                    console.log("found active trip");
+                    console.log(true);
+                    return true;
+                }
+            }
+            formAlerts(elder, currentLocation);
+        },
+        error: function(error) {
+        }
     });
 };
 
@@ -298,6 +318,7 @@ router.post('/:username/addTrip', function(req, res){
     var tripName = req.body.tripName;
     var startDateStr = req.body.startDate;
     var endDateStr = req.body.endDate;
+    var approved = Boolean(req.body.approved);
     var startDate = new Date(startDateStr);
     var endDate = new Date(endDateStr);
     console.log(username);
@@ -310,7 +331,7 @@ router.post('/:username/addTrip', function(req, res){
                 var elderObjQuery = new parse.Query(Elder);
                 elderObjQuery.get(elderId,{
                     success: function(elder) {
-                        var trip = Trip.spawn(elder.get("user").username, tripName, true, startDate, endDate);
+                        var trip = Trip.spawn(elder.get("user").username, tripName, approved, startDate, endDate);
                         trip.save();
                         res.status(200).redirect('back');
                     },
@@ -422,6 +443,45 @@ router.get('/:username/getTripRequests', function(req,res){
     }); 
 });
 
+router.post('/:username/deleteTrip', function(req,res){
+    var username = req.params.username;
+    var tripName = req.body.tripName;
+
+    var tripQuery = new parse.Query(TripQ);
+    tripQuery.equalTo("elderUsername", username);
+    tripQuery.find({
+        success: function(trips){
+            
+            if(trips.length > 0){
+                for(var i in trips){
+                    var trip = trips[i].attributes
+
+                    if(trip.tripName === tripName){
+                        var tripQuery = new parse.Query(Trip);
+                        console.log(trips[i].id)
+                        tripQuery.get(trips[i].id,{
+                            success: function(trip){
+                                trip.destroy({
+                                    success: function(trip){
+                                        res.send(200);
+                                    },
+                                    error: function(trip, error){
+                                        console.log(error);
+                                        res.send(500);
+                                    }
+                                })
+                            }
+                        })
+                    }
+                }
+            }
+        },
+        error: function(user, error) {
+            console.log(error)
+            res.send(500);
+        }
+    });
+})
 
 
 module.exports = router;
