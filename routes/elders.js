@@ -463,7 +463,7 @@ router.post('/:username/deleteTrip', function(req,res){
                             success: function(trip){
                                 trip.destroy({
                                     success: function(trip){
-                                        res.send(200);
+                                        res.send(200).redirect('back');
                                     },
                                     error: function(trip, error){
                                         console.log(error);
