@@ -287,6 +287,7 @@ router.post('/:username/addTrip', function(req, res){
     var tripName = req.body.tripName;
     var startDateStr = req.body.startDate;
     var endDateStr = req.body.endDate;
+    var approved = Boolean(req.body.approved);
     var startDate = new Date(startDateStr);
     var endDate = new Date(endDateStr);
     console.log(username);
@@ -299,7 +300,7 @@ router.post('/:username/addTrip', function(req, res){
                 var elderObjQuery = new parse.Query(Elder);
                 elderObjQuery.get(elderId,{
                     success: function(elder) {
-                        var trip = Trip.spawn(elder.get("user").username, tripName, true, startDate, endDate);
+                        var trip = Trip.spawn(elder.get("user").username, tripName, approved, startDate, endDate);
                         trip.save();
                         res.status(200).redirect('back');
                     },
@@ -411,6 +412,45 @@ router.get('/:username/getTripRequests', function(req,res){
     }); 
 });
 
+router.post('/:username/deleteTrip', function(req,res){
+    var username = req.params.username;
+    var tripName = req.body.tripName;
+
+    var tripQuery = new parse.Query(TripQ);
+    tripQuery.equalTo("elderUsername", username);
+    tripQuery.find({
+        success: function(trips){
+            
+            if(trips.length > 0){
+                for(var i in trips){
+                    var trip = trips[i].attributes
+
+                    if(trip.tripName === tripName){
+                        var tripQuery = new parse.Query(Trip);
+                        console.log(trips[i].id)
+                        tripQuery.get(trips[i].id,{
+                            success: function(trip){
+                                trip.destroy({
+                                    success: function(trip){
+                                        res.send(200);
+                                    },
+                                    error: function(trip, error){
+                                        console.log(error);
+                                        res.send(500);
+                                    }
+                                })
+                            }
+                        })
+                    }
+                }
+            }
+        },
+        error: function(user, error) {
+            console.log(error)
+            res.send(500);
+        }
+    });
+})
 
 
 module.exports = router;
