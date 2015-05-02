@@ -185,10 +185,16 @@ router.get('/:username/getGeoData', function(req, res, next){
                         var foundElder = elder.attributes;
                         console.log(foundElder)
                         var geofence = foundElder.geofence;
-                        var geofenceAtt = geofence.attributes;
-                        var gfLat = geofence.get("location").latitude;
-                        var gfLon = geofence.get("location").longitude;
-                        var gfRadius = geofenceAtt.radius;
+                        if(geofence !== undefined) {
+                            var geofenceAtt = geofence.attributes;
+                            var gfLat = geofence.get("location").latitude;
+                            var gfLon = geofence.get("location").longitude;
+                            var gfRadius = geofenceAtt.radius;
+                        } else {
+                            var gfLat = null;
+                            var gfLon = null;
+                            var gfRadius = null;
+                        }
                         var mostRecentLoc = foundElder.mostRecentLocation;
                         var location_pointers = foundElder.locations;
                         var locations = [];
