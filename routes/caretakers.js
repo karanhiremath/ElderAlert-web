@@ -5,6 +5,9 @@ var parse = require('parse').Parse;
 var Caretaker = parse.Object.extend('Caretaker')
 var Elder = parse.Object.extend('Elder')
 var Trip = parse.Object.extend('Trip');
+var async = require("async");
+var Location = require('./location');
+
 
 router.post('/:username', function(req, res, next){
     
@@ -185,16 +188,40 @@ router.get('/:username/getGeoData', function(req, res, next){
                         var gfLon = geofence.get("location").longitude;
                         var gfRadius = geofenceAtt.radius;
                         var mostRecentLoc = foundElder.mostRecentLocation;
-                        var locations = foundElder.locations;
-                        //TODO: figure out best way to get the actual location objects from the pointers
-                        var geoData = {
-                            gfLat: gfLat,
-                            gfLon: gfLon,
-                            gfRadius: gfRadius,
-                            locations: locations,
-                            mostRecentLocation: mostRecentLoc
-                        };
-                        res.send(geoData);
+                        var location_pointers = foundElder.locations;
+                        var locations = [];
+                        async.each(location_pointers,
+                            function(location_pointer, callback){
+                                // Call an asynchronous function, often a save() to DB
+                                var locationQuery = new parse.Query(Location);
+                                console.log("looking for location_pointers");
+                                console.log(location_pointer.id);
+                                locationQuery.equalTo("objectId", location_pointer.id);
+                                locationQuery.find({
+                                    success: function(location) {
+                                        console.log("found a location");
+                                        console.log(location);
+                                        locations.push(location);
+                                        callback();
+                                    },
+                                    error: function(error) {
+                                        console.log("Error: " + error.code + " " + error.message);
+                                        callback();
+                                    }
+                                });
+                            },
+                            function(err){
+                                console.log(locations);
+                                var geoData = {
+                                    gfLat: gfLat,
+                                    gfLon: gfLon,
+                                    gfRadius: gfRadius,
+                                    locations: locations,
+                                    mostRecentLocation: mostRecentLoc
+                                };
+                                res.send(geoData);
+                            }
+                        );
                     },
                       error: function(user, error) {
                         console.log(error);
