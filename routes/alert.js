@@ -12,7 +12,9 @@ var Alert = parse.Object.extend("Alert", {
   // Class methods
     spawn: function(message, type, elder_username, caretaker_usernames) {
       var caretaker_username;
-      for(caretaker_username in caretaker_usernames){
+
+      for(var i in caretaker_usernames){
+        caretaker_username = caretaker_usernames[i];
         var alert = new Alert();
         alert.set("recipient", caretaker_username);
         alert.set("message", message);
@@ -20,18 +22,21 @@ var Alert = parse.Object.extend("Alert", {
         alert.set("elder", elder_username);
         alert.set("dismissed", false);
         alert.set("seen", false);
+        alert.save();
         var caretakerUsername = caretaker_username;
         var caretakerIdQuery = new parse.Query(Caretaker)
         caretakerIdQuery.equalTo("user.username",caretakerUsername);
         caretakerIdQuery.find({
             success: function(caretakers){
-                
+                console.log("email sending to:");
+
                 if(caretakers.length > 0){
                     var caretakerId = caretakers[0].id 
 
                     var caretakerObjQuery = new parse.Query(Caretaker);
                     caretakerObjQuery.get(caretakerId,{
                         success: function(caretaker) {
+                            console.log("email sending to:" + caretaker_username);
                             if(caretaker.get("email") == true){
                               Alert.sendEmail(message, type, elder_username, caretaker_username);
                             }
@@ -41,6 +46,7 @@ var Alert = parse.Object.extend("Alert", {
             }
         });
       }
+
       return true;
     },
     sendEmail: function(message, type, elder_username, caretaker_username){
