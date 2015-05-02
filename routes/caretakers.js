@@ -5,6 +5,8 @@ var parse = require('parse').Parse;
 var Caretaker = parse.Object.extend('Caretaker')
 var Elder = parse.Object.extend('Elder')
 var Trip = parse.Object.extend('Trip');
+var Alert = require('./alert');
+var User = parse.Object.extend('User')
 var async = require("async");
 var Location = require('./location');
 
@@ -86,7 +88,7 @@ router.post('/:username', function(req, res, next){
 })
 
 router.get('/:username', function(req,res,next){
-    
+    console.log("herllo");
     var username = req.params.username;
     var query = new parse.Query(parse.User);
     query.equalTo("username",username);
