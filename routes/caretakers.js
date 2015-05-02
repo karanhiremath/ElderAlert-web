@@ -88,7 +88,6 @@ router.post('/:username', function(req, res, next){
 })
 
 router.get('/:username', function(req,res,next){
-    console.log("herllo");
     var username = req.params.username;
     var query = new parse.Query(parse.User);
     query.equalTo("username",username);

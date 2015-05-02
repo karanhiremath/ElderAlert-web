@@ -15,6 +15,7 @@
     "morgan": "~1.5.1",
     "serve-favicon": "~2.2.0",
     "parse": "~1.4.1",
-    "mandrill-api":">=1.0.2"
+    "mandrill-api":">=1.0.2",
+    "twilio":"2.1.0"
   }
 }
