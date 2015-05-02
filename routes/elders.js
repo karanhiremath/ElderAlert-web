@@ -5,6 +5,7 @@ var parse = require('parse').Parse;
 var Elder = parse.Object.extend('Elder')
 var Caretaker = parse.Object.extend('Caretaker')
 var Geofence = require('./geofence');
+var Location = require('./location');
 var Alert = require('./alert');
 var Trip = require('./trip');
 var TripQ = parse.Object.extend('Trip');
@@ -76,7 +77,7 @@ router.post('/:username', function(req, res, next){
 
 
 router.get('/:username', function(req,res,next){
-
+    console.log("got to elders.js");
     var username = req.params.username
     var query = new parse.Query(parse.User);
     query.equalTo("username",username);
@@ -115,15 +116,19 @@ router.get('/:username', function(req,res,next){
                             elder.set("geofences",[]);
                             elder.set("locations",[]);
                             elder.set("timeLastMoved", Date.now());
-                            elder.set("mostRecentLocation", null);
+                            elder.set("mostRecentLocation", new parse.GeoPoint({latitude:0, longitude:0}));
 
                             elder.save(null, {
                                 success: function(elder) {
+                                    console.log("elder saved successfully");
                                     elder = elder.attributes;
                                     user = elder.user
                                     res.render('elder',{
                                         user:user,
                                         elder:elder, error:""});
+                                }, 
+                                error: function(error) {
+                                    console.log(error);
                                 }
                             }); 
                         }
@@ -152,18 +157,22 @@ router.post('/:username/update', function(req,res){
                 var elderObjQuery = new parse.Query(Elder);
                 elderObjQuery.get(elderId,{
                     success: function(elder){
-                        var currentLocation = new parse.GeoPoint({latitude: latitude, longitude: longitude});
+
+                        var currentLocation = new parse.GeoPoint({latitude: parseFloat(latitude), longitude: parseFloat(longitude)});
                         if(checkLastLocation(elder, currentLocation)) {
                             elder.set("timeLastMoved", Date.now());
                             elder.set("mostRecentLocation", currentLocation);
                         }
-                        elder.addUnique("locations", currentLocation);
+                        var locationToAdd = Location.spawn(parseFloat(latitude), parseFloat(longitude));
+                        console.log(locationToAdd);
+                        elder.addUnique("locations", locationToAdd);
                         elder.save({
-                            success: function() {
+                            success: function(elder) {
                                 formAlerts(elder, currentLocation);
                                 res.sendStatus(200);
                             },
-                            error: function() {
+                            error: function(elder, error) {
+                                console.log("Error: " + error.code + " " + error.message);
                                 res.sendStatus(500);
                             }
 
@@ -240,17 +249,19 @@ var checkForNoMotionAlert = function(elder) {
 
 var checkForGeofenceAlert = function(elder, currentLocation){
     var geofence = elder.get("geofence");
-    geofence.fetch({
-        success: function(geofence) {
-            var distance = currentLocation.milesTo(geofence.get("location"));
-            console.log("distance" + distance);
-            if(distance >= geofence.get("radius")) {
-                console.log("alert - Geofence!");
-                var alert = Alert.spawn("Elder out of geofence", "geofence-trespassed", elder.get("user").username, elder.get("caretakers")[0]);
-                alert.save();
+    if(geofence !== undefined) {
+        geofence.fetch({
+            success: function(geofence) {
+                var distance = currentLocation.milesTo(geofence.get("location"));
+                console.log("distance" + distance);
+                if(distance >= geofence.get("radius")) {
+                    console.log("alert - Geofence!");
+                    var alert = Alert.spawn("Elder out of geofence", "geofence-trespassed", elder.get("user").username, elder.get("caretakers")[0]);
+                    alert.save();
+                }
             }
-        }
-    });
+        });
+    }
 };
 
 
