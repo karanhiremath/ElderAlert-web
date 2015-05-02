@@ -165,7 +165,7 @@ router.post('/:username/update', function(req,res){
                         }
                         var locationToAdd = Location.spawn(parseFloat(latitude), parseFloat(longitude));
                         console.log(locationToAdd);
-                        elder.addUnique("locations3", locationToAdd);
+                        elder.addUnique("locations", locationToAdd);
                         elder.save({
                             success: function(elder) {
                                 formAlerts(elder, currentLocation);

@@ -185,7 +185,7 @@ router.get('/:username/getGeoData', function(req, res, next){
                         var gfLon = geofence.get("location").longitude;
                         var gfRadius = geofenceAtt.radius;
                         var mostRecentLoc = foundElder.mostRecentLocation;
-                        var locations = foundElder.locations3;
+                        var locations = foundElder.locations;
                         //TODO: figure out best way to get the actual location objects from the pointers
                         var geoData = {
                             gfLat: gfLat,
