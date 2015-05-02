@@ -29,10 +29,8 @@ var Alert = parse.Object.extend("Alert", {
         caretakerIdQuery.find({
             success: function(caretakers){
                 console.log("email sending to:");
-
                 if(caretakers.length > 0){
                     var caretakerId = caretakers[0].id 
-
                     var caretakerObjQuery = new parse.Query(Caretaker);
                     caretakerObjQuery.get(caretakerId,{
                         success: function(caretaker) {
@@ -66,6 +64,7 @@ var Alert = parse.Object.extend("Alert", {
                             caretakerEmail = caretaker.get("email");
                             console.log(caretakerEmail);
                             var message = {
+                                "html":"<p>"+message+"</p>",
                                 "text": message,
                                 "subject": "Alert from ElderAlert for "+elder_username,
                                 "from_email": "noreply@elderalert.com",
