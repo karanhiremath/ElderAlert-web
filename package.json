@@ -13,6 +13,7 @@
     "jade": "~1.9.2",
     "morgan": "~1.5.1",
     "serve-favicon": "~2.2.0",
-    "parse": "~1.4.1"
+    "parse": "~1.4.1",
+    "sendgrid": "^1.7.0"
   }
 }
