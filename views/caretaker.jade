@@ -73,13 +73,18 @@ block content
                         var dailyPathPoints = [];
                         var weeklyPathPoints = [];
                         for (var i = 0; i < data.locations.length; i++){
-                            var latitude = data.locations[i].latitude;
-                            var longitude = data.locations[i].longitude;
+                            console.log(data.locations[i]);
+                            var latitude = data.locations[i].geopoint.latitude;
+                            console.log("lattitude:" + latitude);
+                            var longitude = data.locations[i].geopoint.longitude;
                             var point = new google.maps.LatLng(latitude, longitude);
+                            if(Date.now() - data.locations[i].date < 604800000) {
                             //if timestamp within week, add to week array
-                            dailyPathPoints.push(point);
+                                dailyPathPoints.push(point);
+                            } else {
                             //if timestamp within day, add to daily array
-                            weeklyPathPoints.push(point);
+                                weeklyPathPoints.push(point);
+                            }
                         }
                         var dailyPath = new google.maps.Polyline({
                           path: dailyPathPoints,

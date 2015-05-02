@@ -201,7 +201,7 @@ router.get('/:username/getGeoData', function(req, res, next){
                                     success: function(location) {
                                         console.log("found a location");
                                         console.log(location);
-                                        locations.push(location);
+                                        locations.push(location[0].attributes);
                                         callback();
                                     },
                                     error: function(error) {
