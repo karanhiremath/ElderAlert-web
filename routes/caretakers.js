@@ -7,6 +7,7 @@ var Elder = parse.Object.extend('Elder')
 var Trip = parse.Object.extend('Trip');
 
 var Alert = require('./alert');
+var AlertQ = parse.Object.extend('Alert')
 var User = parse.Object.extend('User')
 
 var async = require("async");
@@ -346,16 +347,16 @@ router.post('/:username/dismissAlert/:alertId', function(req,res) {
     var username = req.params.username;
     var alertId = req.params.alertId;
 
-    var alertQuery = new parse.Query(Alert);
+    var alertQuery = new parse.Query(AlertQ);
     alertQuery.get(alertId, {
         success: function(alert) {
             var elderUsername = alert.get("elder");
-            var alertsQuery = new parse.Query(Alert);
+            var alertsQuery = new parse.Query(AlertQ);
             alertsQuery.find({
                 success: function(alerts){
                     for(var i in alerts) {
                         var alertId2 = alerts[i].id 
-                        var alertQueryAgain = new parse.Query(Alert);
+                        var alertQueryAgain = new parse.Query(AlertQ);
                         alertQueryAgain.get(alertId2, {
                             success: function(alert2) {
                                 alert2.set("dismissed", true);
