@@ -5,6 +5,7 @@ var parse = require('parse').Parse;
 var Caretaker = parse.Object.extend('Caretaker')
 var Elder = parse.Object.extend('Elder')
 var Trip = parse.Object.extend('Trip');
+var Alert = parse.Object.extend('Alert');
 var async = require("async");
 var Location = require('./location');
 
@@ -337,6 +338,36 @@ router.post('/:username/approveTripRequest/:tripId', function(req, res){
         }
     });
 });
+
+router.post('/:username/dismissAlert/:alertId', function(req,res) {
+    var username = req.params.username;
+    var alertId = req.params.alertId;
+
+    var alertQuery = new parse.Query(Alert);
+    alertQuery.get(alertId, {
+        success: function(alert) {
+            var elderUsername = alert.get("elder");
+            var alertsQuery = new parse.Query(Alert);
+            alertsQuery.find({
+                success: function(alerts){
+                    for(var i in alerts) {
+                        var alertId2 = alerts[i].id 
+                        var alertQueryAgain = new parse.Query(Alert);
+                        alertQueryAgain.get(alertId2, {
+                            success: function(alert2) {
+                                alert2.set("dismissed", true);
+                                alert2.save();
+                            }
+                        })
+                    }
+                    res.sendStatus(200)        
+                }
+            })
+            
+        }
+    })
+})
+
 router.post('/:username/alertSettings', function(req, res){
     var sms = req.body.sms;
     var email = req.body.email;
