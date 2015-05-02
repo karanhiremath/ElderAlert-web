@@ -1,6 +1,11 @@
 var parse = require('parse').Parse;
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill('RzKFmwsc9CV7RgrQ-Gjrag');
+var accountSid = 'AC63fffea0e8f061fd85c7ed34ef0f9ace'; 
+var authToken = 'be674a7a36980655925266e71b991809'; 
+ 
+//require the Twilio module and create a REST client 
+var twilio_client = require('twilio')(accountSid, authToken); 
 var User = parse.Object.extend('User');
 var Caretaker = parse.Object.extend('Caretaker');
 // A complex subclass of Parse.Object
@@ -38,6 +43,9 @@ var Alert = parse.Object.extend("Alert", {
                             if(caretaker.get("email") == true){
                               Alert.sendEmail(message, type, elder_username, caretaker_username);
                             }
+                            if(caretaker.get("sms") == true){
+                              Alert.sendText(message, type, elder_username, caretaker_username);
+                            }
                         }
                     })
                 }
@@ -46,6 +54,36 @@ var Alert = parse.Object.extend("Alert", {
       }
 
       return true;
+    },
+    sendText: function(message, type, elder_username, caretaker_username){
+        var caretakerUsername = caretaker_username;
+        var userIdQuery = new parse.Query(User)
+        var caretakerEmail = "";
+        userIdQuery.equalTo("username",caretakerUsername);
+        userIdQuery.find({
+            success: function(caretakers){
+                
+                if(caretakers.length > 0){
+                    var caretakerId = caretakers[0].id 
+
+                    var userObjQuery = new parse.Query(User);
+                    userObjQuery.get(caretakerId,{
+                        success: function(caretaker) {
+                            caretakerEmail = caretaker.get("email");
+                            caretakerPhone = caretaker.get("phone");
+                            console.log(caretakerEmail);
+                            twilio_client.messages.create({  
+                              from: "+12407768175",
+                              to: caretakerPhone,
+                              body: "Alert from ElderAlert for "+elder_username+": "+message,    
+                            }, function(err, message) { 
+                              console.log(message.sid); 
+                            });
+                        }
+                    })
+                }
+            }
+        });
     },
     sendEmail: function(message, type, elder_username, caretaker_username){
         var caretakerUsername = caretaker_username;
