@@ -5,8 +5,11 @@ var parse = require('parse').Parse;
 var Caretaker = parse.Object.extend('Caretaker')
 var Elder = parse.Object.extend('Elder')
 var Trip = parse.Object.extend('Trip');
+
 var Alert = require('./alert');
+var AlertQ = parse.Object.extend('Alert')
 var User = parse.Object.extend('User')
+
 var async = require("async");
 var Location = require('./location');
 
@@ -184,10 +187,16 @@ router.get('/:username/getGeoData', function(req, res, next){
                         var foundElder = elder.attributes;
                         console.log(foundElder)
                         var geofence = foundElder.geofence;
-                        var geofenceAtt = geofence.attributes;
-                        var gfLat = geofence.get("location").latitude;
-                        var gfLon = geofence.get("location").longitude;
-                        var gfRadius = geofenceAtt.radius;
+                        if(geofence !== undefined) {
+                            var geofenceAtt = geofence.attributes;
+                            var gfLat = geofence.get("location").latitude;
+                            var gfLon = geofence.get("location").longitude;
+                            var gfRadius = geofenceAtt.radius;
+                        } else {
+                            var gfLat = null;
+                            var gfLon = null;
+                            var gfRadius = null;
+                        }
                         var mostRecentLoc = foundElder.mostRecentLocation;
                         var location_pointers = foundElder.locations;
                         var locations = [];
@@ -338,6 +347,36 @@ router.post('/:username/approveTripRequest/:tripId', function(req, res){
         }
     });
 });
+
+router.post('/:username/dismissAlert/:alertId', function(req,res) {
+    var username = req.params.username;
+    var alertId = req.params.alertId;
+
+    var alertQuery = new parse.Query(AlertQ);
+    alertQuery.get(alertId, {
+        success: function(alert) {
+            var elderUsername = alert.get("elder");
+            var alertsQuery = new parse.Query(AlertQ);
+            alertsQuery.find({
+                success: function(alerts){
+                    for(var i in alerts) {
+                        var alertId2 = alerts[i].id 
+                        var alertQueryAgain = new parse.Query(AlertQ);
+                        alertQueryAgain.get(alertId2, {
+                            success: function(alert2) {
+                                alert2.set("dismissed", true);
+                                alert2.save();
+                            }
+                        })
+                    }
+                    res.sendStatus(200)        
+                }
+            })
+            
+        }
+    })
+})
+
 router.post('/:username/alertSettings', function(req, res){
     var sms = req.body.sms;
     var email = req.body.email;
