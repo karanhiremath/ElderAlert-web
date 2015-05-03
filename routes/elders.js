@@ -260,7 +260,7 @@ var tripsActive = function(elder, currentLocation) {
 var checkForNoMotionAlert = function(elder) {
     console.log(elder.get("timeLastMoved"));
     console.log(Date.now());
-    if(Date.now() - elder.get("timeLastMoved") > 86,400,000) {
+    if(Date.now() - elder.get("timeLastMoved") > 86400000) {
         console.log("alert - no motion");
         var alert = Alert.spawn("Elder has not moved in a day!", "no-motion", elder.get("user").username, elder.get("caretakers"));
 

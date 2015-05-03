@@ -113,7 +113,9 @@ router.get('/:username', function(req,res,next){
                         } else{
                             console.log(caretaker) 
                             var email = caretaker.email
-                            var sms = caretaker.sms  
+                            var sms = caretaker.sms 
+                            var nomotion = caretaker.nomotion
+                            var geofence = caretaker.geofence   
                             console.log(caretaker)
                             console.log(email)
                             console.log(sms) 
@@ -129,6 +131,8 @@ router.get('/:username', function(req,res,next){
                             caretaker:caretaker,
                             email:email,
                             sms:sms,
+                            nomotion: nomotion,
+                            geofence: geofence,
                             elders:elders,
                             elder_requests: elder_requests,
                             topError:"",
@@ -142,11 +146,14 @@ router.get('/:username', function(req,res,next){
                         caretaker.set("elder_requests",[])
                         caretaker.set("email", true)
                         caretaker.set("sms",true)
-
+                        caretaker.set("geofence", true)
+                        caretaker.set("nomotion",true)
                         caretaker.save(null, {
                             success: function(caretaker) {
                                 var email = caretaker.email
                                 var sms = caretaker.sms
+                                var nomotion = caretaker.nomotion
+                                var geofence = caretaker.geofence  
                                 console.log(caretaker)
                                 console.log(email)
                                 console.log(sms)
@@ -159,6 +166,8 @@ router.get('/:username', function(req,res,next){
                                     caretaker:caretaker,
                                     email:email,
                                     sms:sms,
+                                    nomotion: nomotion,
+                                    geofence: geofence,
                                     elders:elders,
                                     topError:"",
                                     addError:""
@@ -426,7 +435,8 @@ router.get('/:username/getDismissedAlerts', function(req,res) {
 router.post('/:username/alertSettings', function(req, res){
     var sms = req.body.sms;
     var email = req.body.email;
-
+    var nomotion = req.body.no_motion;
+    var geofence = req.body.geofence;
     console.log("email:" + email);
     console.log("sms"+sms);
     if(sms == "on" || sms == true){
@@ -440,6 +450,18 @@ router.post('/:username/alertSettings', function(req, res){
     }
     else{
         email = false;
+    }
+    if(nomotion == "on" || nomotion == true){
+        nomotion = true;
+    }
+    else{
+        nomotion = false;
+    }
+    if(geofence == "on" || geofence == true){
+        geofence = true;
+    }
+    else{
+        geofence = false;
     }
     var caretakerUsername = req.params.username;
     var caretakerIdQuery = new parse.Query(Caretaker)
@@ -455,6 +477,8 @@ router.post('/:username/alertSettings', function(req, res){
                     success: function(caretaker) {
                         caretaker.set("sms",sms);
                         caretaker.set("email",email);
+                        caretaker.set("nomotion",nomotion);
+                        caretaker.set("geofence",geofence);
                         caretaker.save();
                         return res.redirect('/caretakers/'+caretakerUsername);
                     }

@@ -21,14 +21,6 @@ var Alert = parse.Object.extend("Alert", {
       async.each(caretaker_usernames,
                     function(caretaker_username, callback){
                         // Call an asynchronous function, often a save() to DB
-                        var alert = new Alert();
-                        alert.set("recipient", caretaker_username);
-                        alert.set("message", message);
-                        alert.set("type", type);
-                        alert.set("elder", elder_username);
-                        alert.set("dismissed", false);
-                        alert.set("seen", false);
-                        alert.save();
                         var caretakerUsername = caretaker_username;
                         var caretakerIdQuery = new parse.Query(Caretaker)
                         caretakerIdQuery.equalTo("user.username",caretakerUsername);
@@ -40,12 +32,29 @@ var Alert = parse.Object.extend("Alert", {
                                     var caretakerObjQuery = new parse.Query(Caretaker);
                                     caretakerObjQuery.get(caretakerId,{
                                         success: function(caretaker) {
-                                            console.log("email sending to:" + caretaker_username);
-                                            if(caretaker.get("email") == true){
-                                              Alert.sendEmail(message, type, elder_username, caretaker_username);
+                                            var shouldSend = false;
+                                            if(type === "no-motion" && caretaker.get("nomotion") === true){
+                                                shouldSend = true;
                                             }
-                                            if(caretaker.get("sms") == true){
-                                              Alert.sendText(message, type, elder_username, caretaker_username);
+                                            else if(type === "geofence-trespassed" && caretaker.get("geofence") === true){
+                                                shouldSend = true;
+                                            }
+                                            if(shouldSend){
+                                                var alert = new Alert();
+                                                alert.set("recipient", caretaker_username);
+                                                alert.set("message", message);
+                                                alert.set("type", type);
+                                                alert.set("elder", elder_username);
+                                                alert.set("dismissed", false);
+                                                alert.set("seen", false);
+                                                alert.save();
+                                                console.log("email sending to:" + caretaker_username);
+                                                if(caretaker.get("email") == true){
+                                                  Alert.sendEmail(message, type, elder_username, caretaker_username);
+                                                }
+                                                if(caretaker.get("sms") == true){
+                                                  Alert.sendText(message, type, elder_username, caretaker_username);
+                                                }
                                             }
                                         }
                                     })
