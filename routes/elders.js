@@ -262,7 +262,7 @@ var checkForNoMotionAlert = function(elder) {
     console.log(Date.now());
     if(Date.now() - elder.get("timeLastMoved") > 86,400,000) {
         console.log("alert - no motion");
-        var alert = Alert.spawn("Elder has not moved in a day!", "no-motion", elder.get("user").username, elder.get("caretakers"));
+        var alert = Alert.spawn("Elder has not moved in a day!", "no-motion", elder.get("user").username, elder.get("caretakers")[0]);
         alert.save();
     }
 };
@@ -276,7 +276,8 @@ var checkForGeofenceAlert = function(elder, currentLocation){
                 console.log("distance" + distance);
                 if(distance >= geofence.get("radius")) {
                     console.log("alert - Geofence!");
-                    var alert = Alert.spawn("Elder out of geofence", "geofence-trespassed", elder.get("user").username, elder.get("caretakers"));
+                    var alert = Alert.spawn("Elder out of geofence", "geofence-trespassed", elder.get("user").username, elder.get("caretakers")[0]);
+                    alert.save();
                 }
             }
         });
@@ -318,6 +319,7 @@ router.post('/:username/addTrip', function(req, res){
     var startDateStr = req.body.startDate;
     var endDateStr = req.body.endDate;
     var approved = Boolean(req.body.approved);
+    console.log(approved);
     var startDate = new Date(startDateStr);
     var endDate = new Date(endDateStr);
     console.log(username);
