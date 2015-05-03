@@ -426,13 +426,16 @@ router.get('/:username/getDismissedAlerts', function(req,res) {
 router.post('/:username/alertSettings', function(req, res){
     var sms = req.body.sms;
     var email = req.body.email;
-    if(sms == "on"){
+
+    console.log("email:" + email);
+    console.log("sms"+sms);
+    if(sms == "on" || sms == true){
         sms = true;
     }
     else{
         sms = false;
     }
-    if(email == "on"){
+    if(email == "on" || email == true){
         email = true;
     }
     else{
@@ -453,6 +456,7 @@ router.post('/:username/alertSettings', function(req, res){
                         caretaker.set("sms",sms);
                         caretaker.set("email",email);
                         caretaker.save();
+                        return res.redirect('/caretakers/'+caretakerUsername);
                     }
                 })
             }

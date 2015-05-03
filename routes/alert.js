@@ -17,6 +17,7 @@ var Alert = parse.Object.extend("Alert", {
 }, {
   // Class methods
     spawn: function(message, type, elder_username, caretaker_usernames) {
+      console.log(caretaker_usernames);
       async.each(caretaker_usernames,
                     function(caretaker_username, callback){
                         // Call an asynchronous function, often a save() to DB
