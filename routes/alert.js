@@ -79,7 +79,7 @@ var Alert = parse.Object.extend("Alert", {
                               to: caretakerPhone,
                               body: "Alert from ElderAlert for "+elder_username+": "+message,    
                             }, function(err, message) { 
-                              console.log(message.sid); 
+                              console.log(err); 
                             });
                         }
                     })
