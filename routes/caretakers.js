@@ -350,6 +350,26 @@ router.post('/:username/approveTripRequest/:tripId', function(req, res){
     });
 });
 
+router.post('/:username/deleteTrip/:tripId', function(req, res){
+    var username = req.params.username;
+    var tripId = req.params.tripId;
+    console.log(username);
+    var tripQuery = new parse.Query(Trip);
+    tripQuery.get(tripId, {
+        success: function(trip) {
+            trip.destroy({
+                success:function(trip){
+                    res.redirect('back');
+                }
+            })
+        },
+        error: function(user, error){
+            res.send(500);
+            //trip not found
+        }
+    });
+});
+
 router.post('/:username/dismissAlert/:alertId', function(req,res) {
     var username = req.params.username;
     var alertId = req.params.alertId;
@@ -371,12 +391,36 @@ router.post('/:username/dismissAlert/:alertId', function(req,res) {
                             }
                         })
                     }
-                    res.sendStatus(200)        
+                    res.redirect('back');       
                 }
             })
             
         }
     })
+})
+
+router.get('/:username/getOngoingAlerts', function(req,res) {
+    var username = req.params.username;
+    var alertQuery = new parse.Query(AlertQ);
+    alertQuery.equalTo("recipient", username);
+    alertQuery.equalTo("dismissed", false);
+    alertQuery.find({
+        success:function(alerts){
+            res.send(alerts);
+        }
+    });
+})
+
+router.get('/:username/getDismissedAlerts', function(req,res) {
+    var username = req.params.username;
+    var alertQuery = new parse.Query(AlertQ);
+    alertQuery.equalTo("recipient", username);
+    alertQuery.equalTo("dismissed", true);
+    alertQuery.find({
+        success:function(alerts){
+            res.send(alerts);
+        }
+    });
 })
 
 router.post('/:username/alertSettings', function(req, res){

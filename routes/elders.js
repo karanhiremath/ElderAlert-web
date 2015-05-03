@@ -360,7 +360,10 @@ router.get('/:username/getApprovedTrips', function(req,res){
                 elderObjQuery.get(elderId,{
                     success: function(elder) {
                         var tripQuery = new parse.Query(TripQ);
+                        var currentDate = new Date();
                         tripQuery.equalTo("elderUsername", username);
+                        tripQuery.lessThan("startDate", currentDate);
+                        tripQuery.greaterThan("endDate", currentDate);
                         tripQuery.equalTo("approved", true);
                         tripQuery.ascending("startDate");
                         tripQuery.find({
@@ -381,7 +384,6 @@ router.get('/:username/getApprovedTrips', function(req,res){
 
 router.get('/:username/getUpcomingTrips', function(req,res){
     var username = req.params.username;
-    console.log(username);
     var elderIdQuery = new parse.Query(Elder);
     elderIdQuery.equalTo("user.username",username);
     elderIdQuery.find({
@@ -446,7 +448,7 @@ router.get('/:username/getTripRequests', function(req,res){
 
 router.post('/:username/deleteTrip', function(req,res){
     var username = req.params.username;
-    var tripName = req.body.tripName;
+    var tripName = req.body.tripToDelete;
 
     var tripQuery = new parse.Query(TripQ);
     tripQuery.equalTo("elderUsername", username);
@@ -464,7 +466,7 @@ router.post('/:username/deleteTrip', function(req,res){
                             success: function(trip){
                                 trip.destroy({
                                     success: function(trip){
-                                        res.send(200);
+                                        res.send(200).redirect('back');
                                     },
                                     error: function(trip, error){
                                         console.log(error);
