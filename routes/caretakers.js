@@ -140,6 +140,8 @@ router.get('/:username', function(req,res,next){
                         caretaker.set("user",user)
                         caretaker.set("elders",[])
                         caretaker.set("elder_requests",[])
+                        caretaker.set("email", true)
+                        caretaker.set("sms",true)
 
                         caretaker.save(null, {
                             success: function(caretaker) {
