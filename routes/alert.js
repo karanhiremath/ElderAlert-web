@@ -2,7 +2,8 @@ var parse = require('parse').Parse;
 var mandrill = require('mandrill-api/mandrill');
 var mandrill_client = new mandrill.Mandrill('RzKFmwsc9CV7RgrQ-Gjrag');
 var accountSid = 'AC63fffea0e8f061fd85c7ed34ef0f9ace'; 
-var authToken = 'be674a7a36980655925266e71b991809'; 
+var authToken = 'be674a7a36980655925266e71b991809';
+var async = require('async'); 
  
 //require the Twilio module and create a REST client 
 var twilio_client = require('twilio')(accountSid, authToken); 
