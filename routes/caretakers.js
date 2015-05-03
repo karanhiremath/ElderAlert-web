@@ -64,6 +64,7 @@ router.post('/:username', function(req, res, next){
                                             caretaker.addUnique("elder_requests",elder.get("user").username);
                                             elder.save();
                                             caretaker.save();
+                                            res.redirect('back');
                                         },
                                         error: function(elder, error){
 

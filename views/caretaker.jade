@@ -35,8 +35,9 @@ block content
                     alertTimeIcon.setAttribute("class", "glyphicon glyphicon-time glyph-padd");
                     timeHeading.appendChild(alertTimeIcon);
                     //create and append text
+                    var alertDateStr = new Date(alert.createdAt).toDateString();
                     var alertTimeStr = new Date(alert.createdAt).toLocaleTimeString();
-                    var alertTime = document.createTextNode("As of: " + alertTimeStr);
+                    var alertTime = document.createTextNode("As of: " +alertDateStr+" at "+ alertTimeStr);
                     timeHeading.appendChild(alertTime);
                 //append header to elder name row, then append to list entry
                 alertTimeRow.appendChild(timeHeading);
@@ -57,7 +58,8 @@ block content
         var getOngoingAlerts = function(username){
             $.get(caretakerUsername+'/getOngoingAlerts/', function(data){
                 var ongoingAlertList = document.getElementById('ongoingAlerts');
-                for (var a = 0; a < data.length; a++){
+                if (data.length > 0){
+                    for (var a = 0; a < data.length; a++){
                     var alert = data[a];
                     console.log(alert)
                     var alertId = alert.objectId;
@@ -73,6 +75,15 @@ block content
                     alertListEntry.appendChild(dismiss_btn);
                     dismissForm.appendChild(alertListEntry)
                     ongoingAlertList.appendChild(dismissForm);
+                    }
+                }
+                else{
+                    var ongoingAlertPanel = document.getElementById('ongoingAlertPanel')
+                    var noAlert = document.createElement("h4");
+                    noAlert.setAttribute("style", "margin:10px;")
+                    var noAlertStr = document.createTextNode("No ongoing alerts at this time.");
+                    noAlert.appendChild(noAlertStr);
+                    ongoingAlertPanel.appendChild(noAlert);
                 }
             }); 
         };
@@ -89,29 +100,16 @@ block content
         window.onload = getOngoingAlerts(caretakerUsername);
         window.onload = getDismissedAlerts(caretakerUsername);
 
-
     .row
         .col-xs-6#alertpanel
             .panel.panel-blue
                 .panel-heading Ongoing Alerts
-                .panel-body#alertpanelbody
+                .panel-body.alert-panel-body#ongoingAlertPanel
                     ul(id='ongoingAlerts').list-groups.list-group-no-padding
-                        //- li.list-group-item
-                        //-     .row.alert-entry-row
-                        //-         h4
-                        //-             span.glyphicon.glyphicon-exclamation-sign.glyph-padd
-                        //-             | Alert for: elder
-                        //-     .row.alert-entry-row
-                        //-         h4
-                        //-             span.glyphicon.glyphicon-time.glyph-padd
-                        //-             | @ time of alert
-                        //-     .row.alert-entry-row
-                        //-         h4 Alert message text here
-                        //-     button.btn.btn-default.btn-primary.btn-block.btn-red(type='submit') Dismiss Alert
         .col-xs-6#alertpanel
             .panel.panel-blue
                 .panel-heading Alert History
-                .panel-body#alertpanelbody
+                .panel-body.alert-panel-body#alertHistoryPanel
                     ul(id='dismissedAlerts').list-groups.list-group-no-padding
         
     if(elders)
@@ -291,11 +289,21 @@ block content
                         var approvedTripListId = 'approvedTrips_'+username;
                         //- console.log(data)
                         var tripList = document.getElementById(approvedTripListId);
-                        for (var t = 0; t < data.length; t++){
+                        if(data.length>0){
+                            for (var t = 0; t < data.length; t++){
                             var trip = data[t];
                             var tripListEntry = formatTripEntry(trip);
                             tripList.appendChild(tripListEntry);
+                                }
                         }
+                        else{
+                            var currentTripTab = document.getElementById('tabTripCurrent_'+username);
+                            var noTrips = document.createElement("h4");
+                            noTrips.setAttribute("style", "margin:15px;")
+                            var noTripStr = document.createTextNode("No current trips at this time.");
+                            noTrips.appendChild(noTripStr);
+                            currentTripTab.appendChild(noTrips);
+                        } 
                     }); 
                 };
                 var getUpcomingTrips = function(username){
@@ -303,10 +311,32 @@ block content
                         var upcomingTripListId = 'upcomingTrips_'+username;
                         //- console.log(data)
                         var upcomingTripList = document.getElementById(upcomingTripListId);
-                        for (var t = 0; t < data.length; t++){
+                        if (data.length > 0){
+                            for (var t = 0; t < data.length; t++){
                             var trip = data[t];
+                            var tripId = trip.objectId;
+                            var tripForm = document.createElement('form');
+                            tripForm.setAttribute("method", "post");
                             var tripListEntry = formatTripEntry(trip);
-                            upcomingTripList.appendChild(tripListEntry);
+                            //cancel button
+                            var cancel_btn = document.createElement('button');
+                            cancel_btn.setAttribute("class", "btn btn-default btn-primary btn-block btn-red approve-deny-btn");
+                            cancel_btn.setAttribute('type', 'submit');
+                            cancel_btn.setAttribute('formaction', caretakerUsername+'/deleteTrip/'+tripId);
+                            var cancelBtnTrip = document.createTextNode("Cancel Trip");
+                            cancel_btn.appendChild(cancelBtnTrip);
+                            tripListEntry.appendChild(cancel_btn);
+                            tripForm.appendChild(tripListEntry);
+                            upcomingTripList.appendChild(tripForm);
+                            }
+                        }
+                        else{
+                            var upcomingTripTab = document.getElementById('tabTripUpcoming_'+username);
+                            var noTrips = document.createElement("h4");
+                            noTrips.setAttribute("style", "margin:15px;")
+                            var noTripStr = document.createTextNode("No upcoming trips at this time.");
+                            noTrips.appendChild(noTripStr);
+                            upcomingTripTab.appendChild(noTrips);
                         }
                     }); 
                 };
@@ -315,43 +345,53 @@ block content
                         var caretakerUsername = '#{user.username}';
                         var tripRequestListId = 'tripRequests_'+username;
                         var tripRequestList = document.getElementById(tripRequestListId);
-                        for (var r = 0; r < data.length; r++){
-                            var tripRequest = data[r];
-                            var tripId = tripRequest.objectId;
-                            var tripName = tripRequest.tripName;
-                            var approveForm = document.createElement('form');
-                            approveForm.setAttribute("method", "post");
-                            //approveForm.setAttribute("action", caretakerUsername+'/approveTripRequest/'+tripId);
-                            //add and append hidden value for tripname
-                            var tripNameInput = document.createElement('input');
-                            tripNameInput.setAttribute("type", "hidden");
-                            tripNameInput.setAttribute("name", "tripToDelete");
-                            tripNameInput.setAttribute("value", tripName);
-                            approveForm.appendChild(tripNameInput);
-                            //create and append list entry to form
-                            var requestListEntry = formatTripEntry(tripRequest);
-                            //create btn-group and btn-group-wrap
-                            //var btnGroupWrap = document.createElement('div');
-                            //btnGroupWrap.setAttribute("class", "btn-group-wrap");
-                            //create and append submit button
-                            var approve_btn = document.createElement('button');
-                            approve_btn.setAttribute("class", "btn btn-default btn-primary btn-block btn-green approve-deny-btn");
-                            approve_btn.setAttribute('type', 'submit');
-                            approve_btn.setAttribute('formaction', caretakerUsername+'/approveTripRequest/'+tripId );
-                            var approveBtnText = document.createTextNode("Approve Trip");
-                            approve_btn.appendChild(approveBtnText);
-                            //create and append deny button
-                            var deny_btn = document.createElement('button');
-                            deny_btn.setAttribute("class", "btn btn-default btn-primary btn-block btn-red approve-deny-btn");
-                            deny_btn.setAttribute('type', 'submit');
-                            deny_btn.setAttribute('formaction', caretakerUsername+'/deleteTrip/'+tripId);
-                            var denyBtnText = document.createTextNode("Deny Trip");
-                            deny_btn.appendChild(denyBtnText);
-                            //add buttons to entry
-                            requestListEntry.appendChild(approve_btn);
-                            requestListEntry.appendChild(deny_btn);
-                            approveForm.appendChild(requestListEntry);
-                            tripRequestList.appendChild(approveForm);
+                        if(data.length > 0){
+                            for (var r = 0; r < data.length; r++){
+                                var tripRequest = data[r];
+                                var tripId = tripRequest.objectId;
+                                var tripName = tripRequest.tripName;
+                                var approveForm = document.createElement('form');
+                                approveForm.setAttribute("method", "post");
+                                //approveForm.setAttribute("action", caretakerUsername+'/approveTripRequest/'+tripId);
+                                //add and append hidden value for tripname
+                                var tripNameInput = document.createElement('input');
+                                tripNameInput.setAttribute("type", "hidden");
+                                tripNameInput.setAttribute("name", "tripToDelete");
+                                tripNameInput.setAttribute("value", tripName);
+                                approveForm.appendChild(tripNameInput);
+                                //create and append list entry to form
+                                var requestListEntry = formatTripEntry(tripRequest);
+                                //create btn-group and btn-group-wrap
+                                //var btnGroupWrap = document.createElement('div');
+                                //btnGroupWrap.setAttribute("class", "btn-group-wrap");
+                                //create and append submit button
+                                var approve_btn = document.createElement('button');
+                                approve_btn.setAttribute("class", "btn btn-default btn-primary btn-block btn-green approve-deny-btn");
+                                approve_btn.setAttribute('type', 'submit');
+                                approve_btn.setAttribute('formaction', caretakerUsername+'/approveTripRequest/'+tripId );
+                                var approveBtnText = document.createTextNode("Approve Trip");
+                                approve_btn.appendChild(approveBtnText);
+                                //create and append deny button
+                                var deny_btn = document.createElement('button');
+                                deny_btn.setAttribute("class", "btn btn-default btn-primary btn-block btn-red approve-deny-btn");
+                                deny_btn.setAttribute('type', 'submit');
+                                deny_btn.setAttribute('formaction', caretakerUsername+'/deleteTrip/'+tripId);
+                                var denyBtnText = document.createTextNode("Deny Trip");
+                                deny_btn.appendChild(denyBtnText);
+                                //add buttons to entry
+                                requestListEntry.appendChild(approve_btn);
+                                requestListEntry.appendChild(deny_btn);
+                                approveForm.appendChild(requestListEntry);
+                                tripRequestList.appendChild(approveForm);
+                            }                            
+                        }
+                        else{
+                            var tripRequestTab = document.getElementById('tabTripRequests_'+username);
+                            var noTrips = document.createElement("h4");
+                            noTrips.setAttribute("style", "margin:15px;")
+                            var noTripStr = document.createTextNode("No trip requests at this time.");
+                            noTrips.appendChild(noTripStr);
+                            tripRequestTab.appendChild(noTrips);
                         }
                     }); 
                 };
@@ -434,9 +474,7 @@ block content
                                     button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Add Trip
                             div(id='tabSetAlerts_'+item, class='tab-pane fade')
                                 form.form-horizontal(method='post', action =user.username+'/alertSettings')
-                                    br
                                     h4(style='margin: 10px') Set your alert notification preferences below:
-                                    br
                                     .row.alert-row
                                         .col-md-6
                                             h4(align='center') Email Notifications
@@ -458,9 +496,6 @@ block content
                                             h4(align='center') Geofence Notifications
                                         .col-md-6.col-centered
                                             input(type='checkbox', id='geofence', name='geofence',checked='') 
-                                    
-                                    br
-                                    br
                                     button.btn.btn-lg.btn-primary.btn-block.btn-blue(type='submit') Update Alert Settings     
                             link(type='text/css', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.css', rel='stylesheet')
                             script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.js')
@@ -519,8 +554,6 @@ block content
                                 a(href='#tabTripCurrent_'+item, data-toggle='tab') Current
                             li
                                 a(href='#tabTripUpcoming_'+item, data-toggle='tab') Upcoming
-                            //- li
-                            //-     a(href='#tabTripPast_'+item, data-toggle='tab') Past
                             li
                                 a(href='#tabTripRequests_'+item, data-toggle='tab') Requests
 
@@ -530,33 +563,8 @@ block content
                             ul(id='approvedTrips_'+item).list-groups.list-group-no-padding
                         div(id ='tabTripUpcoming_'+item, class='tab-pane fade')
                             ul(id='upcomingTrips_'+item).list-groups.list-group-no-padding
-                        //- div(id ='tabTripPast_'+item, class='tab-pane fade')
-                        //-     h4 past trips
                         div(id ='tabTripRequests_'+item, class='tab-pane fade')
                             ul(id='tripRequests_'+item).list-groups.list-group-no-padding
-                                //- form(method="post", action='/elders/'+ item + '/approveTripRequest')
-                                //-     li.list-group-item
-                                //-         .row.trip-row
-                                //-             h4.boldText
-                                //-                 span.glyphicon.glyphicon-calendar.glyph-padd 
-                                //-                 | Trip Name
-                                //-         .row.trip-row
-                                //-             h4
-                                //-                 span.glyphicon.glyphicon-hourglass.glyph-padd
-                                //-                 | Duration: XX hours
-                                //-         .row.trip-row
-                                //-             h4
-                                //-                 span.glyphicon.glyphicon-time.glyph-padd
-                                //-                 | Starts: mm/dd/yyy at hh:mm
-                                //-         .row.trip-row
-                                //-             h4
-                                //-                 span.glyphicon.glyphicon-log-in.glyph-padd
-                                //-                 | Ends: mm/dd/yyy at hh:mm
-                                //-         .row.trip-row
-                                //-         .btn-group-wrap
-                                //-             .btn-group
-                                //-                 button.btn.btn-default.btn-primary.btn-block.btn-green.approve-deny-btn(type='submit') Approve Trip
-                                //-                 button.btn.btn-default.btn-primary.btn-block.btn-red.approve-deny-btn(type='submit') Deny Trip
     br
     hr    
     .row
@@ -565,12 +573,12 @@ block content
                 .panel-heading Pending Elders
                 .panel-body
                     ul
-                        if (elder_requests) 
+                        if (elder_requests.length > 0 ) 
                             for item in elder_requests
                                 li
                                     h4= item
                         else
-                            h4 You do not have any pending elder confirmations at this time
+                            h4 You do not have any pending elder confirmations at this time.
         .col-md-3
             if(user.role=='caretaker')
             .panel.panel-default
@@ -589,10 +597,12 @@ block content
                 .panel-heading Current Elders
                 .panel-body
                     ul
-                        if (elders)
+                        if (elders.length > 0)
                         for item in elders
                             li
                                 h4=item
+                        else
+                            h4 There are no elders under your care at this time.
         .col-md-3
             if(user.role=='caretaker')
             .panel.panel-default
