@@ -277,7 +277,7 @@ var checkForGeofenceAlert = function(elder, currentLocation){
                 if(distance >= geofence.get("radius")) {
                     console.log("alert - Geofence!");
                     var alert = Alert.spawn("Elder out of geofence", "geofence-trespassed", elder.get("user").username, elder.get("caretakers")[0]);
-                    alert.save();
+                    
                 }
             }
         });
