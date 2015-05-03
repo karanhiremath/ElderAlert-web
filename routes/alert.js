@@ -80,7 +80,7 @@ var Alert = parse.Object.extend("Alert", {
                             twilio_client.messages.create({  
                               from: "+12407768175",
                               to: caretakerPhone,
-                              body: "Alert from ElderAlert for "+elder_username+": "+message,    
+                              body: "Alert from ElderAlert for "+elder_username+": "+message+". Please check elderalert.herokuapp.com to dismiss this alert.",    
                             }, function(err, message) { 
                               console.log(err); 
                             });
@@ -90,7 +90,7 @@ var Alert = parse.Object.extend("Alert", {
             }
         });
     },
-    sendEmail: function(message, type, elder_username, caretaker_username){
+    sendEmail: function(messageText, type, elder_username, caretaker_username){
         var caretakerUsername = caretaker_username;
         var userIdQuery = new parse.Query(User)
         var caretakerEmail = "";
@@ -105,8 +105,8 @@ var Alert = parse.Object.extend("Alert", {
                             caretakerEmail = caretaker.get("email");
                             console.log(caretakerEmail);
                             var message = {
-                                "html":"<p>"+message+"</p>",
-                                "text": message,
+                                "html":"<p>"+messageText+". Please check <a href='http://elderalert.herokuapp.com'>elderalert.herokuapp.com</a> to dismiss this alert.</p>",
+                                "text": messageText,
                                 "subject": "Alert from ElderAlert for "+elder_username,
                                 "from_email": "noreply@elderalert.com",
                                 "from_name": "ElderAlert",
